@@ -1,12 +1,32 @@
 import { getLocale, type Locale } from './i18n';
 
-// Thin fetch wrapper. Cookies carry the session, so every call includes them.
-//
-// Content endpoints receive the active locale as a query parameter. The locale
-// is read at call time rather than captured once, so a language switch is
-// picked up by the next request instead of needing a client rebuild.
+/* ── Static-mode detection ──────────────────────────────────────────── *
+ * When deployed to GitHub Pages there is no backend.  The build script
+ * (scripts/build-static.ts) pre-bakes every API response under /api/<locale>/
+ * so we can satisfy the same fetch contract from static files alone.
+ */
+const IS_STATIC = import.meta.env.BASE_URL !== '/'   // Vite sets BASE_URL in prod
+  || window.location.hostname.endsWith('.github.io');
+
+/* ── helpers ────────────────────────────────────────────────────────── */
+
 function withLocale(path: string, locale: Locale = getLocale()): string {
   return path + (path.includes('?') ? '&' : '?') + 'locale=' + locale;
+}
+
+/** Build the URL for a static API file.  For problem detail pages the path
+ *  contains a slug segment that must map to a file name:
+ *    /api/problems/two-sum-ii?locale=en  →  /api/en/problems/two-sum-ii.json
+ *  Other endpoints map straightforwardly:
+ *    /api/problems?locale=id             →  /api/id/problems.json
+ *    /api/patterns?locale=en             →  /api/en/patterns.json
+ */
+function staticUrl(path: string): string {
+  const m = path.match(/^\/api\/(\w+)(?:\/(.+?))?(?:\?.*)?$/);
+  if (!m) return path;                       // fallback: return as-is
+  const [, endpoint, slug] = m;
+  if (slug)  return `api/${endpoint}/${slug}.json`;
+  return `api/${endpoint}.json`;
 }
 
 export interface Problem {
@@ -59,9 +79,12 @@ export interface SessionUser {
 }
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, {
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+  const url = IS_STATIC ? staticUrl(path) : path;
+  const res = await fetch(url, {
+    credentials: IS_STATIC ? 'same-origin' : 'include',
+    headers: IS_STATIC
+      ? {}
+      : { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
     ...init,
   });
   const body = await res.json().catch(() => ({}));
