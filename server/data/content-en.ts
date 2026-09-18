@@ -23,364 +23,185 @@ export const PROBLEM_EN: Record<string, ProblemTranslation> = {
   'two-sum-ii': {
     title: 'Two Sum II (Sorted Array)',
     statement:
-      'Given an array of integers already sorted in ascending order and a target. Return the indices of the two numbers whose sum equals the target. Each input has exactly one solution and no element may be used twice.',
-    hint: 'Because the array is sorted, the smallest sum is on the left and the largest on the right. How can that discard half the candidates?',
+      'You have a sorted array of numbers and a target. Find two numbers that add up exactly to the target and return their positions. Each problem has exactly one answer, and you cannot use the same element twice.',
+    hint: 'Since the array is sorted, the smallest number is on the left and the largest on the right. If the sum is too small, you must move the left pointer. If too large, move the right. How many candidates can you eliminate per step?',
     walkthrough:
-      'Start with left at index 0 and right at the last index. Add them together. If the sum is too small, the only way to increase it is to move left to the right, since right already holds the largest value. If the sum is too large, move right to the left. Each step discards one candidate for certain, so the total number of steps is at most the length of the array.',
-    solution: `def two_sum_sorted(nums, target):
-    left, right = 0, len(nums) - 1
-    while left < right:
-        total = nums[left] + nums[right]
-        if total == target:
-            return [left, right]
-        if total < target:
-            left += 1
-        else:
-            right -= 1
-    return []`,
+      'Try this with numbers: [2, 7, 11, 15, 19] and target 26.\n\nStart: left at 2, right at 19. Sum = 21, less than 26, so move left right.\nNow: left at 7, right at 19. Sum = 26. Found!\n\nKey insight: since the array is sorted, if the sum is too low, the only way to increase it is to drop the smallest number (move left). If too high, drop the largest (move right). Each step eliminates exactly one candidate, so at most array length steps.',
+    solution: `def two_sum_sorted(nums, target):\n    left, right = 0, len(nums) - 1\n    while left < right:\n        total = nums[left] + nums[right]\n        if total == target:\n            return [left, right]\n        if total < target:\n            left += 1\n        else:\n            right -= 1\n    return []`,
   },
   'valid-palindrome': {
     title: 'Valid Palindrome',
     statement:
-      'Given a string. Check whether it is a palindrome, considering only letters and digits and ignoring differences between upper and lower case.',
-    hint: 'Compare characters from both ends. Which characters may be skipped when you meet them?',
+      'Determine if a string reads the same forwards and backwards (palindrome). Uppercase and lowercase are considered the same, and non-alphanumeric characters (spaces, punctuation) are ignored.',
+    hint: 'Start from both ends of the string, then move inward. If you encounter a space or punctuation, skip it before comparing. Try the example: A man a plan a canal Panama - is it a palindrome?',
     walkthrough:
-      'Place two pointers at the ends of the string. Skip characters that are not letters or digits, then compare. If they differ, the string is not a palindrome. If the two pointers meet or cross, every pair has matched and the string is a palindrome. Each character is examined at most once.',
-    solution: `def is_palindrome(s):
-    left, right = 0, len(s) - 1
-    while left < right:
-        while left < right and not s[left].isalnum():
-            left += 1
-        while left < right and not s[right].isalnum():
-            right -= 1
-        if s[left].lower() != s[right].lower():
-            return False
-        left += 1
-        right -= 1
-    return True`,
+      'Try with A man, a plan, a canal, Panama.\n\nRewrite without spaces/punctuation: amanaplanacanalpanama.\n\nNow place two fingers: one at the start (a), one at the end (a). Match? Move inward.\nSecond: m and m. Match. Move again.\nKeep going until both fingers meet in the middle. No differences? It is a palindrome.\n\nThe trick: you do not need to reverse the whole string. Just compare pairs from outside in. If all match, it is a palindrome. If even one differs, stop immediately.',
+    solution: `def is_palindrome(s):\n    left, right = 0, len(s) - 1\n    while left < right:\n        while left < right and not s[left].isalnum():\n            left += 1\n        while left < right and not s[right].isalnum():\n            right -= 1\n        if s[left].lower() != s[right].lower():\n            return False\n        left += 1\n        right -= 1\n    return True`,
   },
   'container-with-most-water': {
     title: 'Container With Most Water',
     statement:
-      'Given an array of heights, where each element is the height of a wall at that position. Choose two walls that together with the base form the largest water container. Return the maximum volume.',
-    hint: 'The volume is limited by the shorter wall. If we move the taller wall, can the volume grow?',
+      'You have several walls of different heights. Choose two walls that, when placed facing each other, can hold the most water. Return the maximum water volume.',
+    hint: 'Water volume = distance between walls x height of the shorter wall. If you move the taller wall, can the volume increase? Think about: which wall should you move?',
     walkthrough:
-      'Start from both ends, because that gives the widest base. Volume is base times the shortest wall. At each step, move the shorter wall inward. The base always shrinks, so the only hope of increasing the volume is to find a taller wall. For that reason each step is safe to discard and a single pass suffices.',
-    solution: `def max_area(heights):
-    left, right = 0, len(heights) - 1
-    best = 0
-    while left < right:
-        height = min(heights[left], heights[right])
-        best = max(best, height * (right - left))
-        if heights[left] < heights[right]:
-            left += 1
-        else:
-            right -= 1
-    return best`,
+      'Example wall heights: [1, 8, 6, 2, 5, 4, 8, 3, 7].\n\nStart at the widest apart: left=1, right=7. Volume = min(1,7) x 8 = 8.\nMove left (shorter one) to 8. Volume = min(8,7) x 7 = 49. Bigger!\nMove right to 3. Volume = min(8,3) x 6 = 18. Smaller.\n...and so on.\n\nLogic: start from the widest apart. Each step, move the SHORTER wall, because the taller wall does not block. This way every step safely eliminates one wall, and you only need one pass.',
+    solution: `def max_area(heights):\n    left, right = 0, len(heights) - 1\n    best = 0\n    while left < right:\n        height = min(heights[left], heights[right])\n        best = max(best, height * (right - left))\n        if heights[left] < heights[right]:\n            left += 1\n        else:\n            right -= 1\n    return best`,
   },
   'longest-substring-no-repeat': {
     title: 'Longest Substring Without Repeating Characters',
-    statement: 'Given a string. Find the length of the longest substring that contains no repeated characters.',
-    hint: 'When you meet a character already inside the window, what must happen to the left boundary?',
+    statement:
+      'Find the length of the longest substring with no duplicate characters. Substring = a contiguous portion of a string (can be anywhere).',
+    hint: 'Imagine a window that can expand to the right. If the new character is already in the window, slide the left boundary until the old character exits. The largest window length is the answer.',
     walkthrough:
-      'Widen the window to the right by one character each step. If that character is already inside the window, move the left boundary to just past its previous occurrence, because any window containing a duplicate is invalid. Record the largest window length seen. Each index enters and leaves the window once, so the total work is linear.',
-    solution: `def longest_unique_substring(s):
-    last_seen = {}
-    left = 0
-    best = 0
-    for right, ch in enumerate(s):
-        if ch in last_seen and last_seen[ch] >= left:
-            left = last_seen[ch] + 1
-        last_seen[ch] = right
-        best = max(best, right - left + 1)
-    return best`,
+      'Example string: abcabcbb.\n\nStart with empty window, expand right one character at a time:\na (0): window = a, length 1\nb (1): window = ab, length 2\nc (2): window = abc, length 3\na (3): a already exists! Slide left until old a exits. Window = bca, length 3\nb (4): b already exists! Slide left. Window = cab, length 3\nc (5): c already exists! Slide left. Window = abc, length 3\nb (6): b already exists! Slide left. Window = cb, length 2\nb (7): b already exists! Slide left. Window = b, length 1\n\nAnswer: 3.\n\nKey insight: the window is always valid (no duplicates), and each character enters and exits the window exactly once.',
+    solution: `def longest_unique_substring(s):\n    last_seen = {}\n    left = 0\n    best = 0\n    for right, ch in enumerate(s):\n        if ch in last_seen and last_seen[ch] >= left:\n            left = last_seen[ch] + 1\n        last_seen[ch] = right\n        best = max(best, right - left + 1)\n    return best`,
   },
   'maximum-average-subarray': {
     title: 'Maximum Average Subarray',
     statement:
-      'Given an array of integers and a number k. Find the contiguous subarray of exactly length k with the largest average, and return that average.',
-    hint: 'When the window shifts by one step, do you need to re-add everything inside it?',
+      'Given an array of numbers and a number k, find the contiguous subarray of length exactly k with the largest average. Return the average value.',
+    hint: 'When the window length is fixed at k, you do not need to re-sum all elements each time it slides. Just add the incoming element and subtract the outgoing one.',
     walkthrough:
-      'Compute the sum of the first window of length k. For each shift, add the element entering and subtract the element leaving. Because the window length is fixed, the maximum sum immediately gives the maximum average. The total number of additions is linear, not quadratic.',
-    solution: `def max_average(nums, k):
-    total = sum(nums[:k])
-    best = total / k
-    for i in range(k, len(nums)):
-        total += nums[i] - nums[i - k]
-        best = max(best, total / k)
-    return best`,
+      'Example array [1, 12, -5, -6, 50, 3] and k=4.\n\nFirst window: [1, 12, -5, -6]. Sum = 2. Average = 0.5.\nSlide right: exit 1, enter 50. Sum = 2 - 1 + 50 = 51. Average = 12.75.\nSlide right again: exit 12, enter 3. Sum = 51 - 12 + 3 = 42. Average = 10.5.\n\nAnswer: 12.75.\n\nKey insight: do not re-sum from scratch! Just compute the delta: current sum - outgoing + incoming. This makes the solution fast (linear, not quadratic).',
+    solution: `def max_average(nums, k):\n    total = sum(nums[:k])\n    best = total / k\n    for i in range(k, len(nums)):\n        total += nums[i] - nums[i - k]\n        best = max(best, total / k)\n    return best`,
   },
   'two-sum': {
     title: 'Two Sum',
     statement:
-      'Given an array of integers and a target. Return the indices of the two numbers whose sum equals the target. Each input has exactly one solution and no element may be used twice.',
-    hint: 'For each number, its partner can already be computed. What needs to be remembered from earlier steps?',
+      'Given an array of numbers and a target, find two numbers that add up to the target and return their positions. Each problem has exactly one answer.',
+    hint: 'If the current number is x, then its partner must be target - x. The question is: has that partner appeared before?',
     walkthrough:
-      'Because the array is not sorted, two pointers do not apply. Instead, for each number x we need to know whether target minus x has appeared before. Store every number already passed along with its index in a hash map, then look up the partner in constant time. One pass is enough because the pair is always found when its second element is read.',
-    solution: `def two_sum(nums, target):
-    seen = {}
-    for i, x in enumerate(nums):
-        need = target - x
-        if need in seen:
-            return [seen[need], i]
-        seen[x] = i
-    return []`,
+      'Example array [3, 8, 11, 2, 7] and target = 9.\n\nSee 3: partner = 9 - 3 = 6. Never appeared. Save 3 in notebook.\nSee 8: partner = 9 - 8 = 1. Not there. Save 8.\nSee 11: partner = 9 - 11 = -2. Not there. Save 11.\nSee 2: partner = 9 - 2 = 7. Not there. Save 2.\nSee 7: partner = 9 - 7 = 2. There! 2 is in the notebook. Answer: positions 3 and 4.\n\nKey insight: use a hash map (notebook) so you can check if the partner exists in constant time. Just one pass.',
+    solution: `def two_sum(nums, target):\n    seen = {}\n    for i, x in enumerate(nums):\n        need = target - x\n        if need in seen:\n            return [seen[need], i]\n        seen[x] = i\n    return []`,
   },
   'contains-duplicate': {
     title: 'Contains Duplicate',
     statement:
-      'Given an array of integers. Return true if any value appears more than once, and false if every value is unique.',
-    hint: 'How much history of values must be kept before the answer is certain?',
+      'Check if any number appears more than once in the array. If yes, return true. If all numbers are unique, return false.',
+    hint: 'You do not need to compare every pair of numbers (that is slow). Just save the numbers you have seen, then check if the next number is already in the record.',
     walkthrough:
-      'It suffices to record every value already seen in a set. When reading a value, first check whether it is already in the set. If it is, the answer is immediately true and the rest of the array need not be read. If the whole array is read without a repeat, the answer is false. No re-scanning is needed, so the time stays linear.',
-    solution: `def has_duplicate(nums):
-    seen = set()
-    for x in nums:
-        if x in seen:
-            return True
-        seen.add(x)
-    return False`,
+      'Example array [4, 9, 2, 7, 4, 1].\n\nSee 4: record is empty. Save 4.\nSee 9: not in record. Save 9.\nSee 2: not there. Save 2.\nSee 7: not there. Save 7.\nSee 4: IS in record! Immediately answer true.\n\nNo need to check the rest. One find, done.\nIf all checked and no duplicates, answer false.',
+    solution: `def has_duplicate(nums):\n    seen = set()\n    for x in nums:\n        if x in seen:\n            return True\n        seen.add(x)\n    return False`,
   },
   'group-anagrams': {
     title: 'Group Anagrams',
     statement:
-      'Given a list of strings. Group the strings that are anagrams of one another. Anagrams are words with the same letters in a different order.',
-    hint: 'Two anagrams look identical once their letters are sorted. What can serve as the grouping key?',
+      'Given a list of words, group words that are anagrams (same letters, different order). Example: eat, tea, ate are anagrams.',
+    hint: 'If you sort the letters of each word, anagrams will have exactly the same form. For example eat becomes aet, tea also becomes aet. What can serve as a grouping key?',
     walkthrough:
-      'Two words are anagrams if and only if the same letters appear with the same frequencies. Therefore, sort the letters of each word into a stable key, then place that word in the group for that key. Each word is processed once, so the time follows the total number of characters.',
-    solution: `from collections import defaultdict
-
-def group_anagrams(words):
-    groups = defaultdict(list)
-    for word in words:
-        key = ''.join(sorted(word))
-        groups[key].append(word)
-    return list(groups.values())`,
+      'Example words: [eat, tea, tan, ate, nat, bat].\n\nSort letters of each word:\neat -> aet\ntea -> aet\ntan -> ant\nate -> aet\nnat -> ant\nbat -> abt\n\nNow group by sorted form:\naet -> [eat, tea, ate]\nant -> [tan, nat]\nabt -> [bat]\n\nKey insight: same sorted letters = anagram. Use the sorted form as a key in a hash map, then put each word into the matching group.',
+    solution: `from collections import defaultdict\n\ndef group_anagrams(words):\n    groups = defaultdict(list)\n    for word in words:\n        key = ''.join(sorted(word))\n        groups[key].append(word)\n    return list(groups.values())`,
   },
   'binary-search-classic': {
     title: 'Classic Binary Search',
     statement:
-      'Given an array of integers sorted in ascending order and a target. If the target is found, return its index. If not, return negative one.',
-    hint: 'After checking the midpoint, which part of the array certainly does not contain the target?',
+      'Array is sorted from smallest to largest. Find the target position. If found, return its index. If not, return -1.',
+    hint: 'Imagine a phone book: if you look for name M, go straight to the middle. If M is bigger than middle, search right. If smaller, search left. How many times can you divide in half?',
     walkthrough:
-      'Compare the target with the midpoint value. If they are equal, the target is found. If the target is larger, everything to the left including the midpoint is certainly too small, so the search space becomes the right half. If the target is smaller, the reverse applies. The search space halves each step, so at most a logarithmic number of steps relative to the element count is performed.',
-    solution: `def binary_search(nums, target):
-    left, right = 0, len(nums) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if nums[mid] == target:
-            return mid
-        if nums[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
-    return -1`,
+      'Example array [3, 9, 14, 21, 27, 33, 41, 56, 68, 75] and target = 41.\n\nStep 1: middle = 27. 41 > 27, search right.\nStep 2: middle = 56. 41 < 56, search left.\nStep 3: middle = 41. Found! Return index.\n\nIf target = 50:\nStep 1: middle = 27. Search right.\nStep 2: middle = 56. Search left.\nStep 3: middle = 41. Search right.\nStep 4: middle = 68. Search left.\nSpace exhausted. Return -1.\n\nKey insight: each step eliminates HALF the remaining search. From 10 numbers, just 4 steps. From 1000, just 10 steps.',
+    solution: `def binary_search(nums, target):\n    left, right = 0, len(nums) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if nums[mid] == target:\n            return mid\n        if nums[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1`,
   },
   'search-rotated': {
     title: 'Search in Rotated Sorted Array',
     statement:
-      'A sorted array has been rotated at an unknown point. Given a target, return its index or negative one if it is not found.',
-    hint: 'After rotation, at least one of the two halves is always sorted. How do you check that quickly?',
+      'Array was originally sorted but has been rotated at some point. For example [4, 5, 6, 7, 0, 1, 2] is a rotation of [0, 1, 2, 4, 5, 6, 7]. Find the target in this rotated array.',
+    hint: 'After rotation, there is always at least one half that is still sorted (left or right). If the left half is sorted, you can check: is the target in the left range? If not, it must be on the right.',
     walkthrough:
-      'Compare the leftmost value with the midpoint value. If the left is not greater than the midpoint, the left half is sorted, so the target can easily be tested for lying inside that range or not. If it is not sorted, then the right half is the sorted one and the same test is applied there. Each step still discards half the search space, so it remains logarithmic.',
-    solution: `def search_rotated(nums, target):
-    left, right = 0, len(nums) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if nums[mid] == target:
-            return mid
-        if nums[left] <= nums[mid]:
-            if nums[left] <= target < nums[mid]:
-                right = mid - 1
-            else:
-                left = mid + 1
-        else:
-            if nums[mid] < target <= nums[right]:
-                left = mid + 1
-            else:
-                right = mid - 1
-    return -1`,
+      'Example array [27, 33, 41, 56, 68, 3, 9, 14, 21] and target = 9.\n\nStep 1: left=27, mid=56. Left <= Mid? Yes. So left [27..56] is sorted. Is 9 there? No (9 < 27). Search right.\nStep 2: left=3, mid=9. Left <= Mid? Yes. Is 9 in [3..9]? Yes! Search left.\nStep 3: found at middle index!\n\nKey insight: each step, first figure out which half is sorted, then check if the target could be in that half.',
+    solution: `def search_rotated(nums, target):\n    left, right = 0, len(nums) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if nums[mid] == target:\n            return mid\n        if nums[left] <= nums[mid]:\n            if nums[left] <= target < nums[mid]:\n                right = mid - 1\n            else:\n                left = mid + 1\n        else:\n            if nums[mid] < target <= nums[right]:\n                left = mid + 1\n            else:\n                right = mid - 1\n    return -1`,
   },
   'climbing-stairs': {
     title: 'Climbing Stairs',
     statement:
-      'A staircase has n steps. Each move can cover one or two steps. How many distinct ways are there to reach the top?',
-    hint: 'To reach step n, from which steps are you able to move?',
+      'You have a staircase with n steps. Each step, you can climb 1 or 2 steps. How many different ways are there to reach the top?',
+    hint: 'To reach step 6, you must have come from step 5 (1 step) or step 4 (2 steps). So: ways to 6 = ways to 5 + ways to 4.',
     walkthrough:
-      'The number of ways to reach step n is the sum of the ways to reach step n-1 and step n-2, because the final move can only be one or two steps. This recursion produces the same values repeatedly, so subproblem results are stored in an array. The computation runs bottom-up, and since only the last two values are needed, the space can be compacted to constant.',
+      'Count manually for n = 6:\nStep 1: 1 way (just climb 1)\nStep 2: 2 ways (1+1 or just 2)\nStep 3: 3 ways (1+1+1, 1+2, 2+1)\n\nPattern: 1, 2, 3, 5, 8, 13...\nThis is Fibonacci!\n\nHow: just keep the last two numbers.\nprev=1, curr=2\nStep 3: new = 1+2 = 3\nStep 4: new = 2+3 = 5\nStep 5: new = 3+5 = 8\nStep 6: new = 5+8 = 13\n\nAnswer: 13 ways.\nKey insight: you do not need to count all possibilities from scratch. Just add the two previous steps.',
   },
   'house-robber': {
     title: 'House Robber',
     statement:
-      'Given an array of the amount of money in each house in a row. The robber may not rob two adjacent houses because the alarm would sound. Compute the maximum amount that can be taken.',
-    hint: 'At each house there are two choices: take this house or skip it. How do you express both as two states?',
+      'There is a row of houses, each containing some money. The rule: you cannot rob two adjacent houses (alarm goes off). Calculate the maximum amount of money you can take.',
+    hint: 'At each house, you only have two choices: take this house or skip it. If you take it, the previous house must be skipped. If you skip, take the best from before. Try computing two values at each step.',
     walkthrough:
-      'For each house, compute two values: the best total if that house is taken, and the best total if it is not. If the house is taken, the previous house must be skipped. If it is not taken, the best total so far still applies. The two values are updated in order, so only two variables are needed. Each house is processed once.',
-    solution: `def rob(nums):
-    take, skip = 0, 0
-    for x in nums:
-        take, skip = skip + x, max(skip, take)
-    return max(take, skip)`,
+      'Example money in houses: [2, 7, 9, 3, 1].\n\nHouse 1 (2): take=2, skip=0\nHouse 2 (7): take=0+7=7, skip=max(2,0)=2\nHouse 3 (9): take=2+9=11, skip=max(7,2)=7\nHouse 4 (3): take=7+3=10, skip=max(11,7)=11\nHouse 5 (1): take=11+1=12, skip=max(10,11)=11\n\nAnswer: max(12, 11) = 12. (Take houses 1 + 3 + 5 = 2+9+1 = 12)\n\nKey insight: at each house, compute two values: if you take this house and if you skip. Moving to the next house, these two values update.',
+    solution: `def rob(nums):\n    take, skip = 0, 0\n    for x in nums:\n        take, skip = skip + x, max(skip, take)\n    return max(take, skip)`,
   },
   'number-of-islands': {
     title: 'Number of Islands',
     statement:
-      'Given a two-dimensional grid of ones for land and zeros for water. An island is a group of land connected horizontally or vertically. Count the islands.',
-    hint: 'Each time you find land you have not visited, how many new islands does that reveal?',
+      'A grid contains 1 (land) and 0 (water). An island = a group of land connected horizontally or vertically. Count the number of islands.',
+    hint: 'Each time you find a 1 that has not been visited, that is the start of a new island. Then mark all connected land so it is not counted again.',
     walkthrough:
-      'Scan every cell of the grid. When you find land you have not visited, increment the island counter, then traverse all the connected land by any means, whether using a queue for layer-by-layer traversal or a stack for depth-first traversal. Every visited cell is marked so it is not counted twice. The total work follows the number of cells.',
-    solution: `from collections import deque
-
-def count_islands(grid):
-    if not grid:
-        return 0
-    rows, cols = len(grid), len(grid[0])
-    total = 0
-    for r in range(rows):
-        for c in range(cols):
-            if grid[r][c] == '1':
-                total += 1
-                grid[r][c] = '0'
-                queue = deque([(r, c)])
-                while queue:
-                    cr, cc = queue.popleft()
-                    for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                        nr, nc = cr + dr, cc + dc
-                        if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == '1':
-                            grid[nr][nc] = '0'
-                            queue.append((nr, nc))
-    return total`,
+      'Example grid:\n1 1 0 0 0\n1 0 0 1 1\n0 0 0 1 0\n0 1 0 0 0\n0 1 0 1 1\n\nStart from top left:\nFound (0,0) = 1. New island! Mark all connected: (0,0), (0,1), (1,0) = 3 cells.\nFound (1,3) = 1. New island! Mark: (1,3), (1,4), (2,3) = 3 cells.\nFound (3,1) = 1. New island! Mark: (3,1), (4,1) = 2 cells.\nFound (4,3) = 1. New island! Mark: (4,3), (4,4) = 2 cells.\n\nAnswer: 4 islands.\n\nKey insight: scan all cells. If you find land, increment count, then color the entire island so it is not counted twice.',
+    solution: `from collections import deque\n\ndef count_islands(grid):\n    if not grid:\n        return 0\n    rows, cols = len(grid), len(grid[0])\n    total = 0\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] == '1':\n                total += 1\n                grid[r][c] = '0'\n                queue = deque([(r, c)])\n                while queue:\n                    cr, cc = queue.popleft()\n                    for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):\n                        nr, nc = cr + dr, cc + dc\n                        if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == '1':\n                            grid[nr][nc] = '0'\n                            queue.append((nr, nc))\n    return total`,
     time_complexity: 'O(rows * cols)',
     space_complexity: 'O(rows * cols)',
   },
   'shortest-path-grid': {
     title: 'Shortest Path in a Grid',
     statement:
-      'Given a grid of empty cells and obstacles, plus a start point and a destination. Find the fewest number of moves to get from start to destination using four-directional movement, or return negative one if no path exists.',
-    hint: 'Which traversal strategy guarantees the shortest distance is found first?',
+      'Grid contains 0 (passable) and 1 (obstacle). Start at top-left corner, aim for bottom-right. Find the fewest steps (moves: up, down, left, right). If no path exists, return -1.',
+    hint: 'BFS (breadth-first search) always finds the shortest path first. Why? Because all distance-1 cells are visited first, then distance-2, and so on.',
     walkthrough:
-      'Layer-by-layer traversal visits all cells one move away, then two moves away, and so on. Therefore the destination cell reached first is certainly reached by the shortest path. Store each cell distance together with its position in the queue, and mark cells already entered so they are not processed again.',
-    solution: `from collections import deque
-
-def shortest_path(grid, start, goal):
-    rows, cols = len(grid), len(grid[0])
-    queue = deque([(start[0], start[1], 0)])
-    seen = {tuple(start)}
-    while queue:
-        r, c, dist = queue.popleft()
-        if [r, c] == list(goal):
-            return dist
-        for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-            nr, nc = r + dr, c + dc
-            if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 0 and (nr, nc) not in seen:
-                seen.add((nr, nc))
-                queue.append((nr, nc, dist + 1))
-    return -1`,
+      'Example grid:\n0 0 0 0 0\n1 1 0 1 0\n0 0 0 1 0\n0 1 1 1 0\n0 0 0 0 0\n\nStart at (0,0). Mark as visited.\nDistance 1: all reachable neighbors.\nDistance 2: neighbors of distance-1 cells.\n...and so on.\nUntil (4,4) is reached.\n\nShortest path: 8 steps.\n\nKey insight: with BFS, the first time you reach the destination, it is GUARANTEED to be the shortest path. No need to check all possible paths.',
+    solution: `from collections import deque\n\ndef shortest_path(grid, start, goal):\n    rows, cols = len(grid), len(grid[0])\n    queue = deque([(start[0], start[1], 0)])\n    seen = {tuple(start)}\n    while queue:\n        r, c, dist = queue.popleft()\n        if [r, c] == list(goal):\n            return dist\n        for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 0 and (nr, nc) not in seen:\n                seen.add((nr, nc))\n                queue.append((nr, nc, dist + 1))\n    return -1`,
     time_complexity: 'O(rows * cols)',
     space_complexity: 'O(rows * cols)',
   },
   'valid-parentheses': {
     title: 'Valid Parentheses',
     statement:
-      'Given a string containing only bracket characters. Determine whether it is valid, that is, every opening bracket is closed by a bracket of the same type and in the correct order.',
-    hint: 'A closing bracket must pair with the most recent unclosed opening bracket. Which data structure fits?',
+      'Determine if a string of brackets is valid. Valid means: every opening bracket must be closed by the same type, and in the correct order. Valid example: ([{}]). Invalid example: ([)].',
+    hint: 'When you open a bracket {, the matching closing bracket must come AFTER all brackets inside it are closed first. What data structure is good for waiting?',
     walkthrough:
-      'When reading an opening bracket, push it onto the stack. When reading a closing bracket, the stack must contain a matching partner on top, and that partner is then removed. If the stack is empty when a closing bracket appears, or the type does not match, the string is immediately invalid. At the end of the scan, the stack must be empty. Each character is processed once.',
+      'Example string: ([{}]).\n\nRead (: stack empty. Push (. Stack: [(]\nRead [: match. Push [. Stack: [(,[]\nRead {: match. Push {. Stack: [(,[,{]\nRead }: matches { on top. Pop. Stack: [(,[]\nRead ]: matches [ on top. Pop. Stack: [(]\nRead ): matches ( on top. Pop. Stack: []\n\nDone, stack is empty = valid!\n\nInvalid example ([)]:\nRead (: stack [(]\nRead [: stack [(,[]\nRead ): should match [, but found ). NOT VALID!\n\nKey insight: the stack always holds opening brackets that are still waiting for their match.',
   },
   'daily-temperatures': {
     title: 'Daily Temperatures',
     statement:
-      'Given a list of daily temperatures. For each day, compute how many days until a warmer temperature appears. If none exists, fill in zero.',
-    hint: 'Keep the days that have not yet found a warmer temperature. When can a day be resolved?',
+      'Given a list of daily temperatures, for each day calculate: how many days until a warmer temperature? If none exists, fill in 0.',
+    hint: 'If today\'s temperature is warmer than several days ago, then those past days already have their answer. Save the days still waiting in a stack.',
     walkthrough:
-      'Scan temperatures from left to right and keep the indices of days still waiting on the stack, with temperatures decreasing from bottom to top. When today is warmer than the temperature at the top index, that day has found its answer, namely the index difference. Pop and repeat while the condition still holds, then push today. Each index enters and leaves the stack once, so the total work is linear.',
-    solution: `def daily_temperatures(temps):
-    result = [0] * len(temps)
-    stack = []
-    for i, t in enumerate(temps):
-        while stack and temps[stack[-1]] < t:
-            j = stack.pop()
-            result[j] = i - j
-        stack.append(i)
-    return result`,
+      'Example temperatures: [71, 69, 72, 76, 73].\n\nDay 0 (71): stack empty, push 0. Stack: [0]\nDay 1 (69): 69 < 71, nothing finished. Push 1. Stack: [0, 1]\nDay 2 (72): 72 > 69! Day 1 done: 2-1 = 1 day away. Pop 1.\n       72 > 71! Day 0 done: 2-0 = 2 days away. Pop 0.\n       Push 2. Stack: [2]\nDay 3 (76): 76 > 72! Day 2 done: 3-2 = 1. Pop 2.\n       Push 3. Stack: [3]\nDay 4 (73): 73 < 76, not done. Push 4. Stack: [3, 4]\n\nRemaining in stack [3, 4] have no warmer temperature = 0.\nAnswer: [2, 1, 1, 0, 0]\n\nKey insight: the stack saves indices of days that have not found a warmer temperature. When today is warmer, the waiting days get their answer immediately.',
+    solution: `def daily_temperatures(temps):\n    result = [0] * len(temps)\n    stack = []\n    for i, t in enumerate(temps):\n        while stack and temps[stack[-1]] < t:\n            j = stack.pop()\n            result[j] = i - j\n        stack.append(i)\n    return result`,
   },
   'merge-intervals': {
     title: 'Merge Intervals',
     statement:
-      'Given a list of intervals. Merge all intervals that overlap and return the list of non-overlapping intervals.',
-    hint: 'If the list is sorted by start point, when do two intervals certainly overlap?',
+      'Given a list of intervals (start-end time pairs). Merge all overlapping intervals. For example [1,3] and [2,6] overlap to become [1,6].',
+    hint: 'If intervals are sorted by start time, you only need to compare one by one from left to right. When do two intervals definitely overlap?',
     walkthrough:
-      'Sort the intervals by start point. After that, overlapping intervals are always adjacent, so a single pass suffices. Compare the start of the next interval with the end of the last merged interval. If it does not exceed it, the two overlap and the end is extended if needed. If it exceeds it, a new interval begins. The sorting dominates the running time.',
+      'Example intervals: [[1,3], [2,6], [8,10], [9,12], [15,18]].\n\nSort (already sorted): [1,3], [2,6], [8,10], [9,12], [15,18]\n\nTake [1,3] as start.\n[2,6]: start 2 <= end 3? Yes! Overlap. Merge: [1, max(3,6)] = [1,6].\n[8,10]: start 8 <= end 6? No. New interval: [8,10].\n[9,12]: start 9 <= end 10? Yes! Merge: [8, max(10,12)] = [8,12].\n[15,18]: start 15 <= end 12? No. New interval: [15,18].\n\nAnswer: [[1,6], [8,12], [15,18]]\n\nKey insight: sort by start first, then check one by one: still overlapping? Merge. Separated? Start a new interval.',
   },
   'meeting-rooms': {
     title: 'Minimum Meeting Rooms',
     statement:
-      'Given a list of meeting schedules with start and end times. Compute the fewest rooms needed for all meetings to take place.',
-    hint: 'A room can only be reused once the previous meeting has ended. When may a room be freed?',
+      'You have a list of meeting schedules (start time, end time). Calculate the minimum number of rooms needed so all meetings can run without conflict.',
+    hint: 'Each time a new meeting starts before another ends, you need a new room. When one ends, that room can be reused. Try sorting start times and end times separately.',
     walkthrough:
-      'Sort the start times and end times separately, then run two pointers. When the next start time is smaller than the earliest end time still active, a new room is needed. Otherwise, the room that ends earliest can be reused immediately. The maximum counter during the process is the answer. Sorting dominates the running time.',
-    solution: `def min_rooms(schedule):
-    starts = sorted(s[0] for s in schedule)
-    ends = sorted(s[1] for s in schedule)
-    i = j = 0
-    rooms = best = 0
-    while i < len(schedule):
-        if starts[i] < ends[j]:
-            rooms += 1
-            best = max(best, rooms)
-            i += 1
-        else:
-            rooms -= 1
-            j += 1
-    return best`,
+      'Example meetings: [[9,10], [9,11], [10,12], [11,13], [14,15]].\n\nSort start times: [9, 9, 10, 11, 14]\nSort end times: [10, 11, 12, 13, 15]\n\nUse 2 pointers:\n9 < 10: meeting starts, need new room. Rooms = 1.\n9 < 10: another meeting starts, need new room. Rooms = 2. (MAX)\n10 >= 10: first meeting ends. Rooms = 1.\n11 >= 11: second meeting ends. Rooms = 0.\n11 < 12: meeting starts. Rooms = 1.\n14 >= 13: meeting ends. Rooms = 0.\n14 < 15: meeting starts. Rooms = 1.\n\nAnswer: 2 rooms.\n\nKey insight: count how many meetings are active at the busiest time. That is the minimum number of rooms.',
+    solution: `def min_rooms(schedule):\n    starts = sorted(s[0] for s in schedule)\n    ends = sorted(s[1] for s in schedule)\n    i = j = 0\n    rooms = best = 0\n    while i < len(schedule):\n        if starts[i] < ends[j]:\n            rooms += 1\n            best = max(best, rooms)\n            i += 1\n        else:\n            rooms -= 1\n            j += 1\n    return best`,
   },
   'min-window-substring': {
     title: 'Minimum Window Substring',
     statement:
-      'Given a source string and a target string. Find the shortest slice of the source that contains all characters of the target with their occurrence counts. If none exists, return an empty string.',
-    hint: 'The window is valid once every requirement is met. Once it is valid, what is the point of moving the left boundary?',
+      'Given two strings: source and target. Find the shortest substring of source that contains all characters from target (including their counts). If none exists, return an empty string.',
+    hint: 'Expand the window to the right until all target characters are covered. Once covered, try shrinking from the left to find a shorter one. When can the window be shrunk?',
     walkthrough:
-      'Widen the right boundary while tracking each character requirement. When every requirement is met, the window is declared valid. While it remains valid, record its length if shorter than the best so far, then move the left boundary to look for a tighter window. This repeats until the right boundary reaches the end of the string. Each character enters and leaves the window once.',
-    solution: `from collections import Counter
-
-def min_window(source, target):
-    need = Counter(target)
-    missing = len(target)
-    left = best_left = 0
-    best_len = len(source) + 1
-    for right, ch in enumerate(source):
-        if need[ch] > 0:
-            missing -= 1
-        need[ch] -= 1
-        while missing == 0:
-            if right - left + 1 < best_len:
-                best_len = right - left + 1
-                best_left = left
-            if need[source[left]] == 0:
-                missing += 1
-            need[source[left]] += 1
-            left += 1
-    if best_len > len(source):
-        return ''
-    return source[best_left:best_left + best_len]`,
+      'Example source = ADOBECODEBANC, target = ABC.\n\nFind A, B, C in source:\nExpand window from left:\nA (0): has A. Needs: A=0, B=1, C=1\nD (1): not target.\nO (2): not target.\nB (3): has B. Needs: A=0, B=0, C=1\nC (4): has C. Needs: A=0, B=0, C=0\n\nAll covered! Current window = ADOBEC, length 6.\nNow shrink from left:\nRemove A: needs A=1, window invalid. Record length 6.\nStart from D, expand again until all covered...\n...Finally window BANC (length 4) is the shortest.\n\nKey insight: expand until valid, then shrink until almost invalid. Repeat.',
+    solution: `from collections import Counter\n\ndef min_window(source, target):\n    need = Counter(target)\n    missing = len(target)\n    left = best_left = 0\n    best_len = len(source) + 1\n    for right, ch in enumerate(source):\n        if need[ch] > 0:\n            missing -= 1\n        need[ch] -= 1\n        while missing == 0:\n            if right - left + 1 < best_len:\n                best_len = right - left + 1\n                best_left = left\n            if need[source[left]] == 0:\n                missing += 1\n            need[source[left]] += 1\n            left += 1\n    if best_len > len(source):\n        return ''\n    return source[best_left:best_left + best_len]`,
   },
   'coin-change': {
     title: 'Coin Change',
     statement:
-      'Given a list of coin values and an amount of money. Return the fewest coins needed to form that amount, or negative one if it is impossible.',
-    hint: 'For each amount, the last coin used could come from any coin value. What is the best previous value?',
+      'You have several coin denominations (e.g. 1, 3, 4) and a target amount. Find the fewest coins needed to make that amount. If impossible, return -1.',
+    hint: 'For amount N, the last coin used could be 1, 3, or 4. So: minimum coins for N = 1 + minimum for (N - coin value). Try counting from smallest amount upward.',
     walkthrough:
-      'Build a table where each cell states the minimum number of coins to form that amount. For each amount from one up to the target, try every coin value as the last coin, then take the best value from the remaining amount. The initial value is filled with an infinity marker so impossible combinations are not treated as valid. The answer sits in the last cell.',
+      'Example coins [1, 3, 4] and target = 6.\n\nBuild table from 0 to 6:\nAmount 0: 0 coins (starting point)\nAmount 1: use coin 1. Remainder 0. Total = 1.\nAmount 2: use coin 1, remainder 1 (need 1 more). Total = 2.\nAmount 3: use coin 3, remainder 0. Total = 1. (Better than 3x coin 1)\nAmount 4: use coin 4, remainder 0. Total = 1.\nAmount 5: coin 1 + remainder 4 (total 2) OR coin 3 + remainder 2 (total 3). Take 2.\nAmount 6: coin 1 + remainder 5 (total 3) OR coin 3 + remainder 3 (total 2) OR coin 4 + remainder 2 (total 3). Take 2.\n\nAnswer: 2 coins (3+3).\n\nKey insight: count from bottom up. For each amount, try all coin types, take the fewest.',
     // The stored solution and complexity notation use Indonesian identifiers
     // (koin, jumlah, nilai, tabel), so they are translated here as well.
-    solution: `def min_coins(coins, amount):
-    IMPOSSIBLE = float('inf')
-    table = [0] + [IMPOSSIBLE] * amount
-    for value in range(1, amount + 1):
-        for c in coins:
-            if c <= value and table[value - c] + 1 < table[value]:
-                table[value] = table[value - c] + 1
-    return -1 if table[amount] == IMPOSSIBLE else table[amount]`,
+    solution: `def min_coins(coins, amount):\n    IMPOSSIBLE = float('inf')\n    table = [0] + [IMPOSSIBLE] * amount\n    for value in range(1, amount + 1):\n        for c in coins:\n            if c <= value and table[value - c] + 1 < table[value]:\n                table[value] = table[value - c] + 1\n    return -1 if table[amount] == IMPOSSIBLE else table[amount]`,
     time_complexity: 'O(amount * len(coins))',
     space_complexity: 'O(amount)',
   },
@@ -396,49 +217,49 @@ export interface PatternTranslation {
 export const PATTERN_EN: Record<string, PatternTranslation> = {
   'two-pointer': {
     name: 'Two Pointer',
-    blurb: 'Two indices moving from opposite ends or in the same direction to discard nested searching.',
+    blurb: 'Two fingers moving from opposite ends or same direction. Best for: sorted arrays, finding pairs. Each step eliminates candidates.',
     recognition: 'A sorted array with a request to find a pair or a particular condition.',
     complexity: 'O(n) time, O(1) space',
   },
   'sliding-window': {
     name: 'Sliding Window',
-    blurb: 'A window that widens and narrows to keep a subset valid.',
+    blurb: 'A window that widens and shrinks to keep a valid subset. Best for: substrings/subarrays, fixed or variable length.',
     recognition: 'A request for the longest or shortest subarray or substring that satisfies a condition.',
     complexity: 'O(n) time, O(k) space',
   },
   'hash-map': {
     name: 'Hash Map',
-    blurb: 'Store what has already been seen so an O(1) lookup replaces a repeated scan.',
+    blurb: 'Save what you have seen in a notebook. Best for: checking duplicates, finding partners. See once, find instantly.',
     recognition: 'A need to ask "has this value appeared before" repeatedly.',
     complexity: 'O(n) time, O(n) space',
   },
   'binary-search': {
     name: 'Binary Search',
-    blurb: 'Half the search space is discarded each step by comparing against the midpoint.',
+    blurb: 'Discard half the search space each step. Best for: sorted arrays, finding one value. From 1000 numbers, just 10 steps.',
     recognition: 'Sorted data, or a monotonic answer space that can be tested at the middle.',
     complexity: 'O(log n) time, O(1) space',
   },
   'dynamic-programming': {
     name: 'Dynamic Programming',
-    blurb: 'Subproblem answers are stored so they are not recomputed.',
+    blurb: 'Count from small to large, save each answer. Best for: repeated choices, optimal substructure.',
     recognition: 'Overlapping repeated choices, where a large answer is built from smaller answers.',
     complexity: 'O(n) to O(n^2) time, O(n) space',
   },
   'bfs-dfs': {
     name: 'BFS & DFS',
-    blurb: 'Traverse a graph or grid layer by layer (BFS) or by diving as deep as possible (DFS).',
+    blurb: 'Traverse layer by layer (BFS) or dive as deep as possible (DFS). Best for: grids/graphs, shortest path, connected components.',
     recognition: 'A grid, tree, or graph structure, with a request for shortest distance or exhaustive exploration.',
     complexity: 'O(V + E) time, O(V) space',
   },
   stack: {
     name: 'Stack',
-    blurb: 'Hold unresolved items, then match them when their counterpart appears.',
+    blurb: 'Stack waits for a match. Best for: balanced brackets, next greater element, expression evaluation.',
     recognition: 'Matching open and close pairs, or a need for the next greater element.',
     complexity: 'O(n) time, O(n) space',
   },
   'greedy-interval': {
     name: 'Greedy & Interval',
-    blurb: 'Sort by a boundary, then take the decision that is optimal for the current step.',
+    blurb: 'Take the best decision for the current step. Best for: intervals, scheduling, greedy is always optimal.',
     recognition: 'Overlapping time intervals or colliding schedules.',
     complexity: 'O(n log n) time, O(1) space',
   },
