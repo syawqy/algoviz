@@ -25,10 +25,15 @@ export const PROBLEMS: ProblemSeed[] = [
     title: 'Two Sum II (Array Terurut)',
     difficulty: 'mudah',
     statement:
-      'Diberikan array bilangan bulat yang sudah terurut menaik dan sebuah target. Kembalikan indeks dua angka yang jumlahnya sama dengan target. Setiap input punya tepat satu solusi dan satu elemen tidak boleh dipakai dua kali.',
-    hint: 'Karena array terurut, jumlah terkecil ada di kiri dan terbesar di kanan. Bagaimana memanfaatkan itu untuk membuang separuh kandidat?',
+      `Kamu punya array angka yang sudah diurut dari kecil ke besar, dan sebuah target. Tugasnya: cari dua angka yang dijumlahkan hasilnya tepat sama dengan target, lalu kembalikan posisi kedua angka itu. Tiap soal dijamin punya tepat satu jawaban, dan angka yang sama tidak boleh dipakai dua kali.`,
+    hint: 'Karena array sudah urut, angka paling kecil ada di kiri dan paling besar di kanan. Kalau jumlahnya terlalu kecil, pasti harus geser yang kiri. Kalau terlalu besar, geser yang kanan. Coba pikirkan: berapa banyak kandidat yang bisa dibuang tiap langkah?',
     walkthrough:
-      'Mulai dengan kiri di indeks 0 dan kanan di indeks terakhir. Jumlahkan keduanya. Jika jumlahnya terlalu kecil, satu-satunya cara memperbesar adalah menggeser kiri ke kanan, karena kanan sudah nilai terbesar. Jika terlalu besar, geser kanan ke kiri. Setiap langkah membuang satu kandidat secara pasti, sehingga total langkah maksimum sebanyak panjang array.',
+      `Coba ini dengan angka: [2, 7, 11, 15, 19] dan target 26.
+
+Awalnya: kiri di 2, kanan di 19. Jumlah = 21, kurang dari 26, berarti kiri harus digeser ke kanan.
+Sekarang: kiri di 7, kanan di 19. Jumlah = 26. Ketemu!
+
+Kuncinya: karena array sudah urut, kalau jumlahnya kurang, satu-satunya cara memperbesar adalah membuang angka terkecil (geser kiri). Kalau kelebihan, buang angka terbesar (geser kanan). Tiap langkah membuang tepat satu kandidat, jadi maksimal sebanyak panjang array langkah saja.`,
     solution: `def two_sum_sorted(nums, target):
     kiri, kanan = 0, len(nums) - 1
     while kiri < kanan:
@@ -53,10 +58,18 @@ export const PROBLEMS: ProblemSeed[] = [
     title: 'Valid Palindrome',
     difficulty: 'mudah',
     statement:
-      'Diberikan sebuah string. Periksa apakah string tersebut palindrom dengan hanya mempertimbangkan huruf dan angka, lalu mengabaikan perbedaan huruf besar dan kecil.',
-    hint: 'Bandingkan karakter dari kedua ujung. Karakter apa yang boleh dilewati saat bertemu?',
+      `Tentukan apakah sebuah string terbaca sama dari depan dan belakang (palindrom). Huruf besar dan kecil dianggap sama, dan karakter selain huruf/angka (spasi, tanda baca) diabaikan.`,
+    hint: 'Mulai dari kedua ujung string, lalu geser ke tengah. Kalau ada spasi atau tanda baca, lewati dulu sebelum membandingkan. Contoh: A man a plan a canal Panama - apakah palindrom?',
     walkthrough:
-      'Tempatkan dua penunjuk di ujung string. Lewati karakter yang bukan huruf atau angka, lalu bandingkan. Jika berbeda, string bukan palindrom. Jika kedua penunjuk bertemu atau bersilangan, seluruh pasangan sudah cocok dan string adalah palindrom. Setiap karakter diperiksa paling banyak satu kali.',
+      `Coba dengan A man, a plan, a canal, Panama.
+
+Tulis ulang tanpa spasi/tanda baca: amanaplanacanalpanama.
+
+Sekarang taruh dua jari: satu di awal (a), satu di akhir (a). Cocok? Geser ke dalam.
+Kedua: m dan m. Cocok. Geser lagi.
+Lanjut terus sampai kedua jari bertemu di tengah. Tidak ada yang beda? Berarti palindrom.
+
+Triknya: tidak perlu membalik seluruh string. Cukup bandingkan pasangan dari luar ke dalam. Kalau semua cocok, itu palindrom. Kalau ada satu saja yang beda, langsung berhenti.`,
     solution: `def is_palindrome(s):
     kiri, kanan = 0, len(s) - 1
     while kiri < kanan:
@@ -87,10 +100,17 @@ export const PROBLEMS: ProblemSeed[] = [
     title: 'Container With Most Water',
     difficulty: 'sedang',
     statement:
-      'Diberikan array tinggi, di mana setiap elemen adalah tinggi dinding pada posisi tersebut. Pilih dua dinding yang bersama alas membentuk penampung air terbesar. Kembalikan volume maksimumnya.',
-    hint: 'Volume dibatasi dinding yang lebih pendek. Jika kita menggeser dinding yang lebih tinggi, apakah volume bisa membesar?',
+      `Kamu punya sejumlah dinding dengan tinggi berbeda. Pilih dua dinding yang jika dipasang berhadapan, bisa menampung air paling banyak. Kembalikan volume air maksimum yang bisa ditampung.`,
+    hint: 'Volume air = jarak antara dinding x tinggi dinding yang lebih pendek. Kalau kamu geser dinding yang lebih tinggi, apakah volume bisa naik? Coba pikirkan: dinding mana yang harus digeser?',
     walkthrough:
-      'Mulai dari kedua ujung, karena itu alas terlebar. Volume adalah alas dikali dinding terpendek. Setiap langkah, geser dinding yang lebih pendek ke dalam. Alas selalu mengecil, jadi satu-satunya harapan memperbesar volume adalah menemukan dinding yang lebih tinggi. Dengan alasan itu, setiap langkah aman dibuang dan kita hanya perlu satu lintasan.',
+      `Misal tinggi dinding: [1, 8, 6, 2, 5, 4, 8, 3, 7].
+
+Mulai dari ujung paling lebar: kiri=1, kanan=7. Volume = min(1,7) x 8 = 8.
+Geser kiri (yang lebih pendek) ke 8. Volume = min(8,7) x 7 = 49. Lebih besar!
+Geser kanan ke 3. Volume = min(8,3) x 6 = 18. Kecil.
+...dst.
+
+Logikanya: mulai dari jarak paling lebar. Tiap langkah, geser dinding yang LEBIH PENDEK, karena dinding yang lebih tinggi tidak menghalangi. Dengan begini setiap langkah aman dibuang, dan cukup satu lintasan saja.`,
     solution: `def max_area(heights):
     kiri, kanan = 0, len(heights) - 1
     terbaik = 0
@@ -120,10 +140,24 @@ export const PROBLEMS: ProblemSeed[] = [
     title: 'Longest Substring Without Repeating Characters',
     difficulty: 'sedang',
     statement:
-      'Diberikan sebuah string. Temukan panjang substring terpanjang yang tidak memuat karakter berulang.',
-    hint: 'Saat menemukan karakter yang sudah ada di dalam jendela, apa yang harus dilakukan pada batas kiri?',
+      `Cari panjang substring terpanjang yang hurufnya tidak ada yang duplikat. Substring = potongan string yang berurutan (bisa dimana saja).`,
+    hint: 'Bayangkan ada jendela yang bisa melebar ke kanan. Kalau huruf yang baru masuk sudah ada di dalam jendela, geser batas kiri sampai huruf lama keluar. Panjang jendela terbesar adalah jawabannya.',
     walkthrough:
-      'Lebarkan jendela ke kanan satu karakter setiap langkah. Jika karakter itu sudah berada di dalam jendela, geser batas kiri tepat melewati kemunculan sebelumnya, karena setiap jendela yang memuat karakter ganda pasti tidak valid. Catat panjang jendela terbesar sepanjang proses. Setiap indeks masuk dan keluar jendela satu kali, sehingga total kerja linear.',
+      `Misal string: abcabcbb.
+
+Mulai jendela kosong, geser kanan satu per satu:
+a (0): jendela = a, panjang 1
+b (1): jendela = ab, panjang 2
+c (2): jendela = abc, panjang 3
+a (3): a sudah ada! Geser kiri sampai a lama keluar. Jendela = bca, panjang 3
+b (4): b sudah ada! Geser kiri. Jendela = cab, panjang 3
+c (5): c sudah ada! Geser kiri. Jendela = abc, panjang 3
+b (6): b sudah ada! Geser kiri. Jendela = cb, panjang 2
+b (7): b sudah ada! Geser kiri. Jendela = b, panjang 1
+
+Jawaban: 3.
+
+Kuncinya: jendela selalu valid (tidak ada duplikat), dan tiap huruf masuk-keluar jendela tepat satu kali.`,
     solution: `def panjang_terpanjang(s):
     posisi = {}
     kiri = 0
@@ -147,10 +181,18 @@ export const PROBLEMS: ProblemSeed[] = [
     title: 'Maximum Average Subarray',
     difficulty: 'mudah',
     statement:
-      'Diberikan array bilangan bulat dan sebuah bilangan k. Temukan subarray berurutan dengan panjang tepat k yang memiliki rata-rata terbesar, lalu kembalikan nilai rata-ratanya.',
-    hint: 'Saat jendela bergeser satu langkah, apakah perlu menjumlahkan ulang seluruh isi jendela?',
+      `Diberikan array angka dan angka k. Temukan subarray berurutan dengan panjang tepat k yang rata-ratanya paling besar. Kembalikan nilai rata-ratanya.`,
+    hint: 'Kalau panjang jendela tetap k, kamu tidak perlu menjumlahkan ulang semua isi jendela tiap bergeser. Cukup tambahkan yang masuk, kurangkan yang keluar.',
     walkthrough:
-      'Hitung jumlah jendela pertama yang panjangnya k. Untuk setiap pergeseran, tambahkan elemen yang baru masuk dan kurangi elemen yang keluar. Karena panjang jendela tetap, jumlah maksimum langsung memberi rata-rata maksimum. Total penjumlahan yang dilakukan linear, bukan kuadratik.',
+      `Misal array [1, 12, -5, -6, 50, 3] dan k=4.
+
+Jendela pertama: [1, 12, -5, -6]. Jumlah = 2. Rata-rata = 0.5.
+Geser kanan: keluar 1, masuk 50. Jumlah = 2 - 1 + 50 = 51. Rata-rata = 12.75.
+Geser kanan lagi: keluar 12, masuk 3. Jumlah = 51 - 12 + 3 = 42. Rata-rata = 10.5.
+
+Jawaban: 12.75.
+
+Kuncinya: jangan menjumlahkan ulang dari awal! Cukup hitung delta: jumlah sekarang - yang keluar + yang masuk. Ini yang bikin solusinya cepat (linear, bukan kuadratik).`,
     solution: `def rata_rata_maks(nums, k):
     total = sum(nums[:k])
     terbaik = total / k
@@ -171,10 +213,18 @@ export const PROBLEMS: ProblemSeed[] = [
     title: 'Two Sum',
     difficulty: 'mudah',
     statement:
-      'Diberikan array bilangan bulat dan sebuah target. Kembalikan indeks dua angka yang jumlahnya sama dengan target. Setiap input punya tepat satu solusi dan satu elemen tidak boleh dipakai dua kali.',
-    hint: 'Untuk setiap angka, angka pasangannya sudah bisa dihitung. Apa yang perlu diingat dari langkah sebelumnya?',
+      `Diberikan array angka dan sebuah target. Cari dua angka yang dijumlahkan hasilnya sama dengan target, lalu kembalikan posisinya. Tiap soal punya tepat satu jawaban.`,
+    hint: 'Kalau angka sekarang adalah x, maka pasangannya harus target - x. Pertanyaannya: apakah pasangan itu sudah pernah muncul sebelumnya?',
     walkthrough:
-      'Karena array tidak terurut, dua penunjuk tidak berlaku. Alih-alih itu, untuk setiap angka x kita perlu tahu apakah target dikurangi x pernah muncul sebelumnya. Simpan setiap angka yang sudah dilewati beserta indeksnya di dalam hash map, lalu periksa pasangannya dalam waktu konstan. Satu lintasan sudah cukup karena pasangan selalu ditemukan saat elemen keduanya dibaca.',
+      `Misal array [3, 8, 11, 2, 7] dan target = 9.
+
+Lihat 3: pasangannya = 9 - 3 = 6. Belum pernah muncul. Simpan 3 di buku catatan.
+Lihat 8: pasangannya = 9 - 8 = 1. Belum ada. Simpan 8.
+Lihat 11: pasangannya = 9 - 11 = -2. Belum ada. Simpan 11.
+Lihat 2: pasangannya = 9 - 2 = 7. Belum ada. Simpan 2.
+Lihat 7: pasangannya = 9 - 7 = 2. Ada! 2 ada di buku catatan. Jawaban: posisi 3 dan 4.
+
+Kuncinya: pakai hash map (buku catatan) supaya bisa cek apakah pasangan sudah ada dalam waktu instan. Cukup satu lintasan.`,
     solution: `def two_sum(nums, target):
     terlihat = {}
     for i, x in enumerate(nums):
@@ -196,10 +246,19 @@ export const PROBLEMS: ProblemSeed[] = [
     title: 'Contains Duplicate',
     difficulty: 'mudah',
     statement:
-      'Diberikan array bilangan bulat. Kembalikan nilai benar jika ada nilai yang muncul lebih dari satu kali, dan salah jika semua nilai unik.',
-    hint: 'Berapa banyak riwayat nilai yang perlu disimpan sebelum jawabannya pasti diketahui?',
+      `Cek apakah ada angka yang muncul lebih dari sekali dalam array. Kalau ya, kembalikan true. Kalau semua angka unik, kembalikan false.`,
+    hint: 'Kamu tidak perlu membandingkan setiap pasang angka (itu lambat). Cukup simpan angka yang sudah dilihat, lalu cek apakah angka berikutnya sudah ada di catatan.',
     walkthrough:
-      'Cukup catat setiap nilai yang sudah dilihat di dalam himpunan. Saat membaca sebuah nilai, periksa dulu apakah ia sudah ada di himpunan. Jika ya, jawabannya langsung benar dan tidak perlu membaca sisa array. Jika seluruh array selesai dibaca tanpa pengulangan, jawabannya salah. Pemindaian ulang tidak diperlukan sehingga waktu tetap linear.',
+      `Misal array [4, 9, 2, 7, 4, 1].
+
+Lihat 4: catatan kosong. Simpan 4.
+Lihat 9: tidak ada di catatan. Simpan 9.
+Lihat 2: tidak ada. Simpan 2.
+Lihat 7: tidak ada. Simpan 7.
+Lihat 4: ADA di catatan! Langsung jawab true.
+
+Tidak perlu cek sisa array. Satu kali temu, langsung selesai.
+Kalau semua sudah dicek dan tidak ada duplikat, jawab false.`,
     solution: `def ada_duplikat(nums):
     terlihat = set()
     for x in nums:
@@ -220,10 +279,25 @@ export const PROBLEMS: ProblemSeed[] = [
     title: 'Group Anagrams',
     difficulty: 'sedang',
     statement:
-      'Diberikan daftar string. Kelompokkan string yang merupakan anagram satu sama lain. Anagram adalah kata yang hurufnya sama tetapi urutannya berbeda.',
-    hint: 'Dua anagram punya bentuk yang identik jika hurufnya diurutkan. Apa yang bisa dijadikan kunci pengelompokan?',
+      `Diberikan sejumlah kata. Kelompokkan kata yang merupakan anagram (huruf sama, urutan beda). Contoh: eat, tea, ate adalah anagram.`,
+    hint: 'Kalau kamu urutkan huruf setiap kata, anagram akan punya bentuk yang sama persis. Misal eat jadi aet, tea juga jadi aet. Apa yang bisa dijadikan kunci pengelompokan?',
     walkthrough:
-      'Dua kata merupakan anagram jika dan hanya jika huruf-huruf yang sama muncul dengan frekuensi yang sama. Karena itu, urutkan huruf setiap kata menjadi kunci yang stabil, lalu tempatkan kata tersebut di dalam kelompok dengan kunci itu. Setiap kata diproses sekali, sehingga waktu mengikuti jumlah total karakter.',
+      `Misal kata-kata: [eat, tea, tan, ate, nat, bat].
+
+Urutkan huruf setiap kata:
+eat -> aet
+tea -> aet
+tan -> ant
+ate -> aet
+nat -> ant
+bat -> abt
+
+Sekarang kelompokkan berdasarkan bentuk terurut:
+aet -> [eat, tea, ate]
+ant -> [tan, nat]
+abt -> [bat]
+
+Kuncinya: urutan huruf yang sama = anagram. Gunakan bentuk terurut sebagai kunci di hash map, lalu masukkan kata ke kelompok yang sesuai.`,
     solution: `from collections import defaultdict
 
 def kelompok_anagram(kata_kata):
@@ -249,10 +323,23 @@ def kelompok_anagram(kata_kata):
     title: 'Binary Search Klasik',
     difficulty: 'mudah',
     statement:
-      'Diberikan array bilangan bulat yang terurut menaik dan sebuah target. Jika target ditemukan, kembalikan indeksnya. Jika tidak, kembalikan nilai negatif satu.',
-    hint: 'Setelah memeriksa titik tengah, bagian mana dari array yang pasti tidak berisi target?',
+      `Array sudah diurut dari kecil ke besar. Cari posisi target. Kalau ketemu, kembalikan indeksnya. Kalau tidak, kembalikan -1.`,
+    hint: 'Bayangkan buku telepon: kalau kamu cari nama M, langsung buka tengah. Kalau M lebih besar dari tengah, cari di kanan. Kalau lebih kecil, cari di kiri. Berapa kali kamu bisa membagi dua?',
     walkthrough:
-      'Bandingkan target dengan nilai titik tengah. Jika sama, target ditemukan. Jika target lebih besar, seluruh bagian kiri termasuk titik tengah pasti terlalu kecil sehingga ruang pencarian menjadi separuh kanan. Jika target lebih kecil, berlaku sebaliknya. Ruang pencarian terbagi dua setiap langkah, sehingga paling banyak dilakukan sebanyak logaritma jumlah elemen.',
+      `Misal array [3, 9, 14, 21, 27, 33, 41, 56, 68, 75] dan target = 41.
+
+Langkah 1: tengah = 27. 41 > 27, cari di kanan.
+Langkah 2: tengah = 56. 41 < 56, cari di kiri.
+Langkah 3: tengah = 41. Ketemu! Kembalikan indeks.
+
+Kalau target = 50:
+Langkah 1: tengah = 27. Cari kanan.
+Langkah 2: tengah = 56. Cari kiri.
+Langkah 3: tengah = 41. Cari kanan.
+Langkah 4: tengah = 68. Cari kiri.
+Ruang habis. Kembalikan -1.
+
+Kuncinya: tiap langkah membuang SETENGAH sisa pencarian. Dari 10 angka, cukup 4 langkah. Dari 1000, cukup 10 langkah.`,
     solution: `def cari_biner(nums, target):
     kiri, kanan = 0, len(nums) - 1
     while kiri <= kanan:
@@ -277,10 +364,16 @@ def kelompok_anagram(kata_kata):
     title: 'Search in Rotated Sorted Array',
     difficulty: 'sedang',
     statement:
-      'Array terurut telah diputar pada titik tertentu yang tidak diketahui. Diberikan target, kembalikan indeksnya atau nilai negatif satu jika tidak ditemukan.',
-    hint: 'Setelah diputar, setidaknya satu dari dua separuh selalu terurut. Bagaimana memeriksanya dengan cepat?',
+      `Array awalnya terurut, tapi sudah diputar (rotasi) pada titik tertentu. Misal [4, 5, 6, 7, 0, 1, 2] adalah rotasi dari [0, 1, 2, 4, 5, 6, 7]. Cari target dalam array yang sudah dirotasi ini.`,
+    hint: 'Setelah rotasi, selalu ada minimal satu bagian yang masih terurut (kiri atau kanan). Kalau bagian kiri terurut, kamu bisa cek: apakah target ada di rentang kiri? Kalau tidak, pasti di kanan.',
     walkthrough:
-      'Bandingkan nilai paling kiri dengan nilai tengah. Jika kiri tidak lebih besar dari tengah, berarti separuh kiri terurut, sehingga target bisa diuji dengan mudah berada di dalam rentang tersebut atau tidak. Jika tidak terurut, berarti separuh kanan yang terurut dan pengujian serupa dilakukan di sana. Setiap langkah tetap membuang separuh ruang pencarian sehingga tetap logaritmik.',
+      `Misal array [27, 33, 41, 56, 68, 3, 9, 14, 21] dan target = 9.
+
+Langkah 1: kiri=27, tengah=56. Kiri <= Tengah? Ya. Berarti kiri [27..56] terurut. Apakah 9 ada di sana? Tidak (9 < 27). Cari di kanan.
+Langkah 2: kiri=3, tengah=9. Kiri <= Tengah? Ya. Apakah 9 ada di [3..9]? Ya! Cari di kiri.
+Langkah 3: ketemu di indeks tengah!
+
+Kuncinya: setiap langkah, pastikan dulu bagian mana yang terurut, lalu cek apakah target mungkin ada di bagian itu.`,
     solution: `def cari_terputar(nums, target):
     kiri, kanan = 0, len(nums) - 1
     while kiri <= kanan:
@@ -311,10 +404,26 @@ def kelompok_anagram(kata_kata):
     title: 'Climbing Stairs',
     difficulty: 'mudah',
     statement:
-      'Sebuah tangga memiliki n anak tangga. Setiap langkah naik bisa menempuh satu atau dua anak tangga. Berapa banyak cara berbeda untuk mencapai puncak?',
-    hint: 'Untuk sampai ke anak tangga ke-n, dari anak tangga mana saja kita bisa melangkah?',
+      `Kamu punya tangga dengan n anak tangga. Setiap langkah, kamu bisa naik 1 atau 2 anak tangga. Berapa banyak cara berbeda untuk sampai ke puncak?`,
+    hint: 'Untuk sampai ke anak tangga ke-6, kamu pasti datang dari anak tangga ke-5 (langkah 1) atau ke-4 (langkah 2). Jadi: cara ke-6 = cara ke-5 + cara ke-4.',
     walkthrough:
-      'Cara mencapai anak tangga ke-n adalah jumlah dari cara mencapai anak tangga ke-(n-1) dan ke-(n-2), karena langkah terakhir hanya mungkin satu atau dua anak tangga. Rekursi ini memunculkan nilai yang sama berulang kali, sehingga hasil submasalah disimpan di dalam array. Perhitungan dijalankan dari bawah ke atas, dan karena hanya dua nilai terakhir yang dibutuhkan, ruang bisa dipadatkan menjadi konstan.',
+      `Coba hitung manual untuk n = 6:
+Anak tangga 1: 1 cara (langsung naik 1)
+Anak tangga 2: 2 cara (1+1 atau langsung 2)
+Anak tangga 3: 3 cara (1+1+1, 1+2, 2+1)
+
+Pola: 1, 2, 3, 5, 8, 13...
+Ini deret Fibonacci!
+
+Caranya: cukup simpan dua angka terakhir.
+sebelum=1, sekarang=2
+Langkah 3: baru = 1+2 = 3
+Langkah 4: baru = 2+3 = 5
+Langkah 5: baru = 3+5 = 8
+Langkah 6: baru = 5+8 = 13
+
+Jawaban: 13 cara.
+Kuncinya: tidak perlu menghitung semua kemungkinan dari awal. Cukup jumlahkan dua langkah sebelumnya.`,
     solution: `def cara_naik(n):
     if n <= 2:
         return n
@@ -335,10 +444,20 @@ def kelompok_anagram(kata_kata):
     title: 'House Robber',
     difficulty: 'sedang',
     statement:
-      'Diberikan array jumlah uang di setiap rumah yang berjajar. Perampok tidak boleh merampok dua rumah yang bersebelahan karena alarm akan berbunyi. Hitung jumlah maksimum yang bisa diambil.',
-    hint: 'Di setiap rumah ada dua pilihan: ambil rumah ini atau lewati. Bagaimana menyatakan keduanya sebagai dua status?',
+      `Ada deretan rumah, masing-masing berisi sejumlah uang. Aturannya: kamu tidak boleh merampok dua rumah yang bersebelahan (alarm berbunyi). Hitung jumlah uang maksimum yang bisa diambil.`,
+    hint: 'Di setiap rumah, kamu hanya punya dua pilihan: ambil rumah ini atau lewati. Kalau ambil, rumah sebelumnya pasti dilewati. Kalau lewati, ambil yang terbaik dari sebelumnya. Coba hitung dua nilai sekaligus di setiap langkah.',
     walkthrough:
-      'Untuk setiap rumah, hitung dua nilai: jumlah terbaik jika rumah tersebut diambil, dan jumlah terbaik jika tidak diambil. Jika rumah diambil, rumah sebelumnya harus dilewati. Jika tidak diambil, nilai terbaik sejauh ini tetap berlaku. Kedua nilai ini diperbarui berurutan sehingga hanya dua variabel diperlukan. Setiap rumah diproses satu kali.',
+      `Misal uang di rumah: [2, 7, 9, 3, 1].
+
+Rumah 1 (2): ambil=2, lewati=0
+Rumah 2 (7): ambil=0+7=7, lewati=max(2,0)=2
+Rumah 3 (9): ambil=2+9=11, lewati=max(7,2)=7
+Rumah 4 (3): ambil=7+3=10, lewati=max(11,7)=11
+Rumah 5 (1): ambil=11+1=12, lewati=max(10,11)=11
+
+Jawaban: max(12, 11) = 12. (Ambil rumah 1 + 3 + 5 = 2+9+1 = 12)
+
+Kuncinya: di tiap rumah, hitung dua nilai: kalau ambil rumah ini dan kalau lewati. Pindah ke rumah berikutnya, dua nilai ini diperbarui.`,
     solution: `def rampok(nums):
     ambil, lewati = 0, 0
     for x in nums:
@@ -357,10 +476,25 @@ def kelompok_anagram(kata_kata):
     title: 'Jumlah Pulau',
     difficulty: 'sedang',
     statement:
-      'Diberikan grid dua dimensi berisi karakter satu untuk daratan dan nol untuk air. Pulau adalah kumpulan daratan yang terhubung secara horizontal atau vertikal. Hitung jumlah pulau.',
-    hint: 'Setiap kali menemukan daratan yang belum pernah dikunjungi, berapa banyak pulau baru yang ditemukan?',
+      `Ada grid berisi 1 (tanah) dan 0 (air). Pulau = kumpulan tanah yang terhubung horizontal atau vertikal. Hitung jumlah pulau.`,
+    hint: 'Setiap kali kamu menemukan 1 yang belum dikunjungi, itu awal pulau baru. Lalu tandai semua tanah yang terhubung agar tidak dihitung lagi.',
     walkthrough:
-      'Telusuri setiap sel grid. Saat menemukan daratan yang belum dikunjungi, tambahkan penghitung pulau, lalu telusuri seluruh daratan yang terhubung dengan cara apa pun, baik menggunakan antrean untuk penelusuran lapis demi lapis maupun tumpukan untuk penelusuran mendalam. Setiap sel yang dikunjungi ditandai agar tidak dihitung dua kali. Total kerja mengikuti jumlah sel.',
+      `Misal grid:
+1 1 0 0 0
+1 0 0 1 1
+0 0 0 1 0
+0 1 0 0 0
+0 1 0 1 1
+
+Mulai dari kiri atas:
+Ketemu (0,0) = 1. Pulau baru! Tandai semua yang terhubung: (0,0), (0,1), (1,0) = 3 sel.
+Ketemu (1,3) = 1. Pulau baru! Tandai: (1,3), (1,4), (2,3) = 3 sel.
+Ketemu (3,1) = 1. Pulau baru! Tandai: (3,1), (4,1) = 2 sel.
+Ketemu (4,3) = 1. Pulau baru! Tandai: (4,3), (4,4) = 2 sel.
+
+Jawaban: 4 pulau.
+
+Kuncinya: scan semua sel. Kalau ketemu tanah, tambah hitungan, lalu warnai seluruh pulau supaya tidak dihitung dua kali.`,
     solution: `from collections import deque
 
 def jumlah_pulau(grid):
@@ -404,10 +538,25 @@ def jumlah_pulau(grid):
     title: 'Jalur Terpendek di Grid',
     difficulty: 'sedang',
     statement:
-      'Diberikan grid berisi sel kosong dan rintangan, ditambah titik awal dan titik tujuan. Temukan jumlah langkah paling sedikit untuk berpindah dari awal ke tujuan dengan gerakan empat arah, atau kembalikan negatif satu jika tidak ada jalur.',
-    hint: 'Strategi penelusuran mana yang menjamin jarak terpendek ditemukan lebih dulu?',
+      `Grid berisi 0 (bisa dilewati) dan 1 (rintangan). Mulai dari pojok kiri atas, tujuan ke pojok kanan bawah. Cari jumlah langkah paling sedikit (gerakan: atas, bawah, kiri, kanan). Kalau tidak ada jalur, kembalikan -1.`,
+    hint: 'Penelusuran BFS (lapis demi lapis) selalu menemukan jalur terpendek pertama kali. Kenapa? Karena semua titik jarak 1 dikunjungi dulu, lalu jarak 2, dst.',
     walkthrough:
-      'Penelusuran lapis demi lapis mengunjungi semua sel berjarak satu langkah, lalu dua langkah, dan seterusnya. Karena itu sel tujuan pertama kali yang dicapai pasti melalui jalur terpendek. Simpan jarak setiap sel bersamaan dengan posisinya di dalam antrean, dan tandai sel yang sudah dimasuki agar tidak diproses ulang.',
+      `Misal grid:
+0 0 0 0 0
+1 1 0 1 0
+0 0 0 1 0
+0 1 1 1 0
+0 0 0 0 0
+
+Mulai dari (0,0). Tandai sudah dikunjungi.
+Jarak 1: semua tetangga yang bisa dilewati.
+Jarak 2: tetangga dari jarak 1.
+...dst.
+Sampai (4,4) tercapai.
+
+Jalur terpendek: 8 langkah.
+
+Kuncinya: dengan BFS, pertama kali kamu mencapai tujuan, itu PASTI jalur terpendek. Tidak perlu cek semua kemungkinan jalur.`,
     solution: `from collections import deque
 
 def jalur_terpendek(grid, awal, tujuan):
@@ -448,10 +597,26 @@ def jalur_terpendek(grid, awal, tujuan):
     title: 'Valid Parentheses',
     difficulty: 'mudah',
     statement:
-      'Diberikan string yang hanya berisi karakter kurung. Tentukan apakah string tersebut valid, yaitu setiap kurung buka ditutup oleh kurung dengan jenis yang sama dan dalam urutan yang benar.',
-    hint: 'Kurung penutup harus berpasangan dengan kurung buka terakhir yang belum tertutup. Struktur data apa yang sesuai?',
+      `Tentukan apakah string kurung valid. Valid artinya: setiap kurung buka harus ditutup oleh jenis yang sama, dan urutannya benar. Contoh valid: ([{}]). Contoh tidak valid: ([)].`,
+    hint: 'Kalau kamu buka kurung {, kurung penutup yang cocok harus datang SETELAH semua kurung di dalamnya tertutup dulu. Struktur data apa yang cocok untuk menunggu?',
     walkthrough:
-      'Saat membaca kurung buka, dorong ke dalam tumpukan. Saat membaca kurung penutup, tumpukan harus berisi pasangan yang cocok di posisi teratas, lalu pasangan itu dikeluarkan. Jika tumpukan kosong saat kurung penutup muncul, atau jenisnya tidak cocok, string langsung tidak valid. Di akhir pemindaian, tumpukan harus kosong. Setiap karakter diproses satu kali.',
+      `Misal string: ([{}]).
+
+Baca (: tumpukan kosong. Dorong (. Tumpukan: [(]
+Baca [: cocok. Dorong [. Tumpukan: [(,[]
+Baca {: cocok. Dorong {. Tumpukan: [(,[,{]
+Baca }: cocok dengan { di atas. Pop. Tumpukan: [(,[]
+Baca ]: cocok dengan [ di atas. Pop. Tumpukan: [(]
+Baca ): cocok dengan ( di atas. Pop. Tumpukan: []
+
+Selesai, tumpukan kosong = valid!
+
+Contoh tidak valid ([)]:
+Baca (: tumpukan [(]
+Baca [: tumpukan [(,[]
+Baca ): harusnya cocok [, tapi nemunya ). TIDAK VALID!
+
+Kuncinya: tumpukan selalu menyimpan kurung buka yang masih menunggu pasangannya.`,
     solution: `def valid_kurung(s):
     pasangan = {')': '(', ']': '[', '}': '{'}
     tumpukan = []
@@ -476,10 +641,24 @@ def jalur_terpendek(grid, awal, tujuan):
     title: 'Suhu Harian',
     difficulty: 'sedang',
     statement:
-      'Diberikan daftar suhu harian. Untuk setiap hari, hitung berapa hari lagi sampai muncul suhu yang lebih tinggi. Jika tidak ada, isi dengan nol.',
-    hint: 'Simpan hari-hari yang belum menemukan suhu lebih tinggi. Kapan sebuah hari bisa diselesaikan?',
+      `Diberikan daftar suhu setiap hari. Untuk setiap hari, hitung: berapa hari lagi sampai ada suhu yang lebih panas? Kalau tidak ada yang lebih panas, isi 0.`,
+    hint: 'Kalau suhu hari ini lebih panas dari suhu beberapa hari lalu, maka hari-hari lalu itu sudah punya jawaban. Simpan hari-hari yang masih menunggu di tumpukan.',
     walkthrough:
-      'Telusuri suhu dari kiri ke kanan dan simpan indeks hari yang masih menunggu di dalam tumpukan, dengan suhu yang menurun dari bawah ke atas. Saat suhu hari ini lebih tinggi daripada suhu pada indeks teratas, hari itu sudah menemukan jawabannya, yaitu selisih indeks. Keluarkan dan ulangi selama kondisi masih terpenuhi, lalu dorong indeks hari ini. Setiap indeks masuk dan keluar tumpukan satu kali sehingga total kerja linear.',
+      `Misal suhu: [71, 69, 72, 76, 73].
+
+Hari 0 (71): tumpukan kosong, dorong 0. Tumpukan: [0]
+Hari 1 (69): 69 < 71, tidak ada yang selesai. Dorong 1. Tumpukan: [0, 1]
+Hari 2 (72): 72 > 69! Hari 1 selesai: 2-1 = 1 hari lagi. Pop 1.
+       72 > 71! Hari 0 selesai: 2-0 = 2 hari lagi. Pop 0.
+       Dorong 2. Tumpukan: [2]
+Hari 3 (76): 76 > 72! Hari 2 selesai: 3-2 = 1. Pop 2.
+       Dorong 3. Tumpukan: [3]
+Hari 4 (73): 73 < 76, tidak selesai. Dorong 4. Tumpukan: [3, 4]
+
+Sisa di tumpukan [3, 4] tidak punya suhu lebih panas = 0.
+Jawaban: [2, 1, 1, 0, 0]
+
+Kuncinya: tumpukan menyimpan indeks hari yang belum menemukan suhu lebih panas. Kalau hari ini lebih panas, hari-hari di tumpukan langsung dapat jawaban.`,
     solution: `def suhu_lebih_tinggi(suhu):
     hasil = [0] * len(suhu)
     tumpukan = []
@@ -502,10 +681,22 @@ def jalur_terpendek(grid, awal, tujuan):
     title: 'Merge Intervals',
     difficulty: 'sedang',
     statement:
-      'Diberikan daftar interval. Gabungkan semua interval yang saling tumpang tindih dan kembalikan daftar interval yang tidak tumpang tindih.',
-    hint: 'Jika daftar diurutkan berdasarkan titik awal, kapan dua interval pasti tumpang tindih?',
+      `Diberikan daftar interval (pasangan waktu mulai-selesai). Gabungkan semua interval yang saling tumpang tindih. Misal [1,3] dan [2,6] tumpang tindih jadi [1,6].`,
+    hint: 'Kalau interval diurutkan berdasarkan waktu mulai, kamu hanya perlu membandingkan satu per satu dari kiri ke kanan. Kapan dua interval pasti tumpang tindih?',
     walkthrough:
-      'Urutkan interval berdasarkan titik awal. Setelah itu interval yang tumpang tindih selalu berdekatan, sehingga cukup satu lintasan. Bandingkan titik awal interval berikutnya dengan titik akhir interval terakhir yang sudah digabungkan. Jika tidak melebihi, keduanya tumpang tindih dan titik akhir diperpanjang bila perlu. Jika melebihi, interval baru dimulai. Dominasi waktu ada pada pengurutan.',
+      `Misal interval: [[1,3], [2,6], [8,10], [9,12], [15,18]].
+
+Urutkan (sudah urut): [1,3], [2,6], [8,10], [9,12], [15,18]
+
+Ambil [1,3] sebagai awal.
+[2,6]: mulai 2 <= selesai 3? Ya! Tumpang tindih. Gabung: [1, max(3,6)] = [1,6].
+[8,10]: mulai 8 <= selesai 6? Tidak. Interval baru: [8,10].
+[9,12]: mulai 9 <= selesai 10? Ya! Gabung: [8, max(10,12)] = [8,12].
+[15,18]: mulai 15 <= selesai 12? Tidak. Interval baru: [15,18].
+
+Jawaban: [[1,6], [8,12], [15,18]]
+
+Kuncinya: urutkan dulu berdasarkan awal, lalu cek satu per satu: masih tumpang tindih? Gabung. Sudah terpisah? Mulai interval baru.`,
     solution: `def gabung_interval(interval):
     interval.sort(key=lambda x: x[0])
     hasil = []
@@ -536,10 +727,26 @@ def jalur_terpendek(grid, awal, tujuan):
     title: 'Ruangan Rapat Minimum',
     difficulty: 'sedang',
     statement:
-      'Diberikan daftar jadwal rapat berupa waktu mulai dan selesai. Hitung jumlah ruangan paling sedikit yang dibutuhkan agar semua rapat dapat berlangsung.',
-    hint: 'Ruangan hanya bisa dipakai ulang jika rapat sebelumnya sudah selesai. Kapan sebuah ruangan boleh dibebaskan?',
+      `Kamu punya daftar jadwal rapat (waktu mulai, waktu selesai). Hitung jumlah ruangan minimum yang dibutuhkan agar semua rapat bisa berjalan tanpa bentrok.`,
+    hint: 'Setiap kali rapat baru mulai sebelum yang lain selesai, kamu butuh ruangan baru. Kalau sudah selesai, ruangan itu bisa dipakai ulang. Coba urutkan waktu mulai dan waktu selesai secara terpisah.',
     walkthrough:
-      'Urutkan waktu mulai dan waktu selesai secara terpisah, lalu jalankan dua penunjuk. Saat waktu mulai berikutnya lebih kecil daripada waktu selesai paling awal yang masih aktif, sebuah ruangan baru dibutuhkan. Jika tidak, ruangan yang paling awal selesai bisa langsung dipakai ulang. Penghitung maksimum selama proses adalah jawaban. Pengurutan mendominasi waktu.',
+      `Misal rapat: [[9,10], [9,11], [10,12], [11,13], [14,15]].
+
+Urutkan waktu mulai: [9, 9, 10, 11, 14]
+Urutkan waktu selesai: [10, 11, 12, 13, 15]
+
+Mulai dengan 2 pointer:
+9 < 10: rapat mulai, butuh ruangan baru. Ruangan = 1.
+9 < 10: rapat mulai lagi, butuh ruangan baru. Ruangan = 2. (MAX)
+10 >= 10: rapat pertama selesai. Ruangan = 1.
+11 >= 11: rapat kedua selesai. Ruangan = 0.
+11 < 12: rapat mulai. Ruangan = 1.
+14 >= 13: rapat selesai. Ruangan = 0.
+14 < 15: rapat mulai. Ruangan = 1.
+
+Jawaban: 2 ruangan.
+
+Kuncinya: hitung berapa banyak rapat yang aktif bersamaan di waktu tertinggi. Itu jumlah ruangan minimum.`,
     solution: `def ruangan_minimum(jadwal):
     mulai = sorted(j[0] for j in jadwal)
     selesai = sorted(j[1] for j in jadwal)
@@ -576,10 +783,26 @@ def jalur_terpendek(grid, awal, tujuan):
     title: 'Minimum Window Substring',
     difficulty: 'sulit',
     statement:
-      'Diberikan string sumber dan string target. Temukan potongan terpendek dari sumber yang memuat semua karakter target beserta jumlah kemunculannya. Jika tidak ada, kembalikan string kosong.',
-    hint: 'Jendela sudah valid ketika semua kebutuhan terpenuhi. Setelah valid, apa gunanya menggeser batas kiri?',
+      `Diberikan dua string: sumber dan target. Cari potongan terpendek dari sumber yang memuat semua karakter dari target (termasuk jumlah kemunculannya). Kalau tidak ada, kembalikan string kosong.`,
+    hint: 'Perbesar jendela ke kanan sampai semua karakter target tercakup. Kalau sudah tercakup, coba perkecil dari kiri untuk cari yang lebih pendek. Kapan jendela boleh diperkecil?',
     walkthrough:
-      'Lebarkan batas kanan sambil melacak kebutuhan setiap karakter. Ketika semua kebutuhan terpenuhi, jendela dinyatakan valid. Selama masih valid, catat panjangnya bila lebih pendek dari yang terbaik, lalu geser batas kiri untuk mencari jendela yang lebih rapat. Proses ini berulang sampai batas kanan mencapai akhir string. Setiap karakter masuk dan keluar jendela satu kali.',
+      `Misal sumber = ADOBECODEBANC, target = ABC.
+
+Cari A, B, C dalam sumber:
+Perbesar jendela dari kiri:
+A (0): sudah ada A. Kebutuhan: A=0, B=1, C=1
+D (1): bukan target.
+O (2): bukan target.
+B (3): sudah ada B. Kebutuhan: A=0, B=0, C=1
+C (4): sudah ada C. Kebutuhan: A=0, B=0, C=0
+
+Semua tercakup! Jendela saat ini = ADOBEC, panjang 6.
+Sekarang perkecil dari kiri:
+Buang A: kebutuhan A=1, jendela tidak valid. Catat panjang 6.
+Mulai dari D, perbesar lagi sampai semua tercakup...
+...Akhirnya jendela BANC (panjang 4) adalah yang terpendek.
+
+Kuncinya: perbesar sampai valid, lalu perkecil sampai hampir tidak valid. Ulangi.`,
     solution: `from collections import Counter
 
 def jendela_minimum(sumber, target):
@@ -619,10 +842,23 @@ def jendela_minimum(sumber, target):
     title: 'Coin Change',
     difficulty: 'sedang',
     statement:
-      'Diberikan daftar nilai koin dan sebuah jumlah uang. Kembalikan jumlah koin paling sedikit untuk membentuk jumlah tersebut, atau negatif satu jika tidak mungkin.',
-    hint: 'Untuk setiap jumlah, koin terakhir yang dipakai bisa berasal dari nilai koin mana saja. Berapa nilai terbaik sebelumnya?',
+      `Kamu punya beberapa jenis koin (misal 1, 3, 4) dan jumlah uang tertentu. Hitung jumlah koin paling sedikit yang dibutuhkan untuk membentuk jumlah uang itu. Kalau tidak mungkin, kembalikan -1.`,
+    hint: 'Untuk jumlah uang N, koin terakhir yang dipakai bisa bernilai 1, 3, atau 4. Jadi: cara minimum untuk N = 1 + minimum untuk (N - nilai koin). Coba hitung dari jumlah terkecil ke besar.',
     walkthrough:
-      'Bangun tabel di mana setiap sel menyatakan jumlah koin minimum untuk membentuk sejumlah uang. Untuk setiap jumlah dari satu sampai target, coba setiap nilai koin sebagai koin terakhir, lalu ambil nilai terbaik dari jumlah yang tersisa. Nilai awal diisi dengan penanda tak terhingga agar kombinasi yang tidak mungkin tidak dianggap sah. Jawaban ada di sel terakhir.',
+      `Misal koin [1, 3, 4] dan target = 6.
+
+Bangun tabel dari 0 sampai 6:
+Jumlah 0: 0 koin (sudah di titik awal)
+Jumlah 1: pakai koin 1. Sisa 0. Total = 1.
+Jumlah 2: pakai koin 1, sisa 1 (butuh 1 lagi). Total = 2.
+Jumlah 3: pakai koin 3, sisa 0. Total = 1. (Lebih baik dari 3x koin 1)
+Jumlah 4: pakai koin 4, sisa 0. Total = 1.
+Jumlah 5: pakai koin 1 + sisa 4 (total 2) ATAU koin 3 + sisa 2 (total 3). Ambil 2.
+Jumlah 6: pakai koin 1 + sisa 5 (total 3) ATAU koin 3 + sisa 3 (total 2) ATAU koin 4 + sisa 2 (total 3). Ambil 2.
+
+Jawaban: 2 koin (3+3).
+
+Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin, ambil yang paling sedikit.`,
     solution: `def koin_minimum(koin, jumlah):
     TAK_MUNGKIN = float('inf')
     tabel = [0] + [TAK_MUNGKIN] * jumlah
