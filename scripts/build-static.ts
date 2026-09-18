@@ -12,7 +12,7 @@ import Database from 'bun:sqlite';
 
 const root = resolve(import.meta.dir, '..');
 const db = new Database(resolve(root, 'algoviz.db'), { readonly: true });
-const outDir = resolve(root, 'web', 'dist', 'api');
+const outDir = resolve(process.env.OUT_DIR || resolve(root, 'web', 'dist'), 'api');
 mkdirSync(outDir, { recursive: true });
 
 // Import English translations from the TypeScript source
@@ -108,8 +108,8 @@ function daily(locale: string) {
 console.log('Building static API data...');
 
 for (const locale of ['id', 'en']) {
-  json(`${locale}/problems.json`, problems(locale));
-  json(`${locale}/patterns.json`, patterns(locale));
+  json(`${locale}/problems.json`, { problems: problems(locale) });
+  json(`${locale}/patterns.json`, { patterns: patterns(locale) });
   json(`${locale}/daily.json`, daily(locale));
 
   const slugs = db.query('SELECT slug FROM problems ORDER BY sort_order').all() as any[];
