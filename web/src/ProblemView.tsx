@@ -3,6 +3,7 @@ import { api, type ProblemDetail } from './api';
 import Visualizer from './Visualizer';
 import { DifficultyBadge, StatusBadge } from './Home';
 import { useTranslation } from './i18n/useTranslation';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface Props {
   slug: string;
@@ -71,11 +72,12 @@ export default function ProblemView({ slug, onBack }: Props) {
       </div>
 
       <div className="split">
-        <section className="panel panel-left">
-          <h3 className="panel-title">{t('problem.visualHeading')}</h3>
+        {/* Left: Visualizer (glassmorphism treatment) */}
+        <section className="panel panel-left viz-panel">
           <Visualizer kind={problem.visual_kind} data={problem.visual_data} />
         </section>
 
+        {/* Right: Explanation (sticky scroll on desktop) */}
         <section className="panel panel-right">
           <h3 className="panel-title">{t('problem.statementHeading')}</h3>
           <p className="statement">{problem.statement}</p>
@@ -91,7 +93,7 @@ export default function ProblemView({ slug, onBack }: Props) {
             </div>
           </div>
 
-          <div className="callout">
+          <div className="callout callout-accent">
             <h4>{t('problem.hintHeading')}</h4>
             <p>{problem.hint}</p>
           </div>
@@ -107,7 +109,11 @@ export default function ProblemView({ slug, onBack }: Props) {
 
           <div className="solution-wrap">
             <button className="btn-ghost" onClick={() => setShowSolution((s) => !s)}>
-              {showSolution ? t('problem.hideSolution') : t('problem.showSolution')}
+              {showSolution ? (
+                <><ChevronDown size={16} /> {t('problem.hideSolution')}</>
+              ) : (
+                <><ChevronRight size={16} /> {t('problem.showSolution')}</>
+              )}
             </button>
             {showSolution ? (
               <>

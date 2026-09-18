@@ -620,6 +620,14 @@ button {
   padding: 14px;
 }
 
+.viz-panel {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-left: 3px solid var(--brand);
+}
+
 .panel-title {
   margin: 0 0 12px;
   font-size: 0.95rem;
