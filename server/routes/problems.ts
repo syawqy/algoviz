@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { getDB } from '../db';
 import { requireAuth, type AuthPayload } from '../auth';
-import { PROBLEM_EN, PATTERN_EN } from '../data/content-en';
+import { PROBLEM_EN, PATTERN_EN, type ProblemTranslation } from '../data/content-en';
 
 export const problemRoutes = new Hono();
 
@@ -28,6 +28,12 @@ function localizeProblem<T extends { slug: string }>(row: T, locale: Locale): T 
     statement: tr.statement,
     hint: tr.hint,
     walkthrough: tr.walkthrough,
+    // Solutions and complexity notation are optional translations: most are
+    // language-neutral, but a stored solution with Indonesian variable names or
+    // a Big-O written as O(jumlah * len(koin)) must not survive into English.
+    ...(tr.solution ? { solution: tr.solution } : {}),
+    ...(tr.time_complexity ? { time_complexity: tr.time_complexity } : {}),
+    ...(tr.space_complexity ? { space_complexity: tr.space_complexity } : {}),
   };
 }
 
@@ -62,14 +68,18 @@ interface ProblemRow {
   pattern_name: string;
 }
 
-function mapProblem(r: ProblemRow, status: string | null = null) {
+// The list and daily routes reuse this mapper, so the translation override has
+// to live here rather than only in the detail handler: a problem whose solution
+// or Big-O notation embeds Indonesian identifiers would otherwise still leak
+// them into the English list view.
+function mapProblem(r: ProblemRow, status: string | null = null, tr?: ProblemTranslation) {
   return {
     id: r.id,
     slug: r.slug,
-    title: r.title,
+    title: tr?.title ?? r.title,
     difficulty: r.difficulty,
-    time_complexity: r.time_complexity,
-    space_complexity: r.space_complexity,
+    time_complexity: tr?.time_complexity ?? r.time_complexity,
+    space_complexity: tr?.space_complexity ?? r.space_complexity,
     pattern_slug: r.pattern_slug,
     pattern_name: r.pattern_name,
     status,
@@ -167,9 +177,7 @@ problemRoutes.get('/problems/:slug', (c: any) => {
 
   return c.json({
     problem: {
-      ...mapProblem(row, status),
-      time_complexity: tr2?.time_complexity ?? row.time_complexity,
-      space_complexity: tr2?.space_complexity ?? row.space_complexity,
+      ...mapProblem(row, status, tr2),
       statement: row.statement,
       hint: row.hint,
       walkthrough: row.walkthrough,

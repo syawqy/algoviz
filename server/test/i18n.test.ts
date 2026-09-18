@@ -160,4 +160,32 @@ describe('localisation', () => {
       expect(String(problem.solution)).not.toContain('undefined');
     }
   });
+
+  test('the list and daily endpoints localise complexity notation too', async () => {
+    // The detail route was localised first, which left the list rendering
+    // "O(jumlah * len(koin))" in English mode. These endpoints share a mapper,
+    // so they need their own check rather than trusting the detail one.
+    const idWords = /\b(jumlah|koin|nilai|tabel|baris|kolom|karakter|indeks|bilangan|panjang|urut)\b/;
+
+    const listRes = await req('/api/problems?locale=en');
+    const list = ((await listRes.json()) as any).problems as Array<Record<string, string>>;
+    expect(list.length).toBeGreaterThan(10);
+
+    const offenders: string[] = [];
+    for (const item of list) {
+      for (const field of ['time_complexity', 'space_complexity', 'title'] as const) {
+        const value = String(item[field] ?? '');
+        if (idWords.test(value)) offenders.push(`list ${item.slug}.${field}: ${value}`);
+      }
+    }
+
+    const dailyRes = await req('/api/daily?day=2026-09-18&locale=en');
+    const daily = ((await dailyRes.json()) as any).problem as Record<string, string>;
+    for (const field of ['time_complexity', 'space_complexity', 'title'] as const) {
+      const value = String(daily[field] ?? '');
+      if (idWords.test(value)) offenders.push(`daily ${daily.slug}.${field}: ${value}`);
+    }
+
+    expect(offenders).toEqual([]);
+  });
 });

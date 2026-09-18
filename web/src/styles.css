@@ -138,6 +138,56 @@ button {
   gap: 8px;
 }
 
+/* ---------- language toggle ---------- */
+
+/* A segmented control: both languages stay visible so the current one and the
+   alternative read at a glance. Each half clears the 44px touch minimum, and
+   the inactive half uses --muted on --surface-2 rather than a light button
+   fill, which would have put near-white text on a near-white background. */
+.lang-toggle {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.lang-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  transition: background 0.2s, color 0.2s;
+}
+
+.lang-btn:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.lang-btn.lang-on {
+  color: var(--text);
+  background: var(--brand-soft);
+}
+
+/* Phones: the header is tight, so the control drops to the 44px height while
+   keeping full tap width. */
+@media (max-width: 520px) {
+  .lang-btn {
+    min-width: 44px;
+    padding: 0 8px;
+  }
+}
+
 .user-chip {
   font-size: 0.8rem;
   color: var(--muted);
