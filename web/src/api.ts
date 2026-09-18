@@ -5,8 +5,10 @@ import { getLocale, type Locale } from './i18n';
  * (scripts/build-static.ts) pre-bakes every API response under /api/<locale>/
  * so we can satisfy the same fetch contract from static files alone.
  */
-const IS_STATIC = import.meta.env.BASE_URL !== '/'   // Vite sets BASE_URL in prod
+const IS_STATIC = import.meta.env.BASE_URL !== '/'
   || window.location.hostname.endsWith('.github.io');
+
+const BASE = import.meta.env.BASE_URL || '/';
 
 /* ── helpers ────────────────────────────────────────────────────────── */
 
@@ -14,19 +16,19 @@ function withLocale(path: string, locale: Locale = getLocale()): string {
   return path + (path.includes('?') ? '&' : '?') + 'locale=' + locale;
 }
 
-/** Build the URL for a static API file.  For problem detail pages the path
- *  contains a slug segment that must map to a file name:
- *    /api/problems/two-sum-ii?locale=en  →  /api/en/problems/two-sum-ii.json
- *  Other endpoints map straightforwardly:
- *    /api/problems?locale=id             →  /api/id/problems.json
- *    /api/patterns?locale=en             →  /api/en/patterns.json
+/** Map a backend API path to a static JSON file path.
+ *  /api/problems?locale=id             →  <base>api/id/problems.json
+ *  /api/problems/coin-change?locale=en →  <base>api/en/problems/coin-change.json
  */
 function staticUrl(path: string): string {
+  const localeMatch = path.match(/[?&]locale=(\w+)/);
+  const locale = localeMatch?.[1] || 'id';
+
   const m = path.match(/^\/api\/(\w+)(?:\/(.+?))?(?:\?.*)?$/);
-  if (!m) return path;                       // fallback: return as-is
+  if (!m) return path;
   const [, endpoint, slug] = m;
-  if (slug)  return `api/${endpoint}/${slug}.json`;
-  return `api/${endpoint}.json`;
+  if (slug)  return `${BASE}api/${locale}/${endpoint}/${slug}.json`;
+  return `${BASE}api/${locale}/${endpoint}.json`;
 }
 
 export interface Problem {
@@ -71,13 +73,6 @@ export interface ProgressRow {
   updated_at: string;
 }
 
-export interface SessionUser {
-  id: number;
-  username: string;
-  role: string;
-  sub: number;
-}
-
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const url = IS_STATIC ? staticUrl(path) : path;
   const res = await fetch(url, {
@@ -93,13 +88,6 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  me: () => req<{ user: SessionUser }>('/api/auth/me'),
-  login: (username: string, password: string) =>
-    req<{ ok: boolean; user: any }>('/api/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-    }),
-  logout: () => req<{ ok: boolean }>('/api/auth/logout', { method: 'POST' }),
   problems: (params: { pattern?: string; difficulty?: string; q?: string } = {}) => {
     const qs = new URLSearchParams(
       Object.entries(params).filter(([, v]) => v) as Array<[string, string]>
@@ -112,9 +100,6 @@ export const api = {
       withLocale(`/api/daily${day ? `?day=${day}` : ''}`)
     ),
   patterns: () => req<{ patterns: Pattern[] }>(withLocale('/api/patterns')),
-  mark: (slug: string, status: 'selesai' | 'ulang') =>
-    req<{ ok: boolean }>('/api/progress', { method: 'POST', body: JSON.stringify({ slug, status }) }),
-  unmark: (slug: string) => req<{ ok: boolean }>(`/api/progress/${slug}`, { method: 'DELETE' }),
   progress: () =>
     req<{
       progress: ProgressRow[];

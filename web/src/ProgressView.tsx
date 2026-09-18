@@ -5,10 +5,9 @@ import { useTranslation } from './i18n/useTranslation';
 
 interface Props {
   onOpen: (slug: string) => void;
-  loggedIn: boolean;
 }
 
-export default function ProgressView({ onOpen, loggedIn }: Props) {
+export default function ProgressView({ onOpen }: Props) {
   const { t, locale } = useTranslation();
   const [rows, setRows] = useState<ProgressRow[]>([]);
   const [stats, setStats] = useState({ selesai: 0, ulang: 0, total: 0, streak: 0 });
@@ -16,28 +15,15 @@ export default function ProgressView({ onOpen, loggedIn }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!loggedIn) {
-      setLoading(false);
-      return;
-    }
     api
       .progress()
       .then((d) => {
         setRows(d.progress as unknown as ProgressRow[]);
         setStats({ selesai: d.selesai, ulang: d.ulang, total: d.total, streak: d.streak });
       })
-      .catch((e) => setErr(String(e.message ?? e)))
+      .catch(() => setErr(''))
       .finally(() => setLoading(false));
-  }, [loggedIn, locale]);
-
-  if (!loggedIn) {
-    return (
-      <div className="page">
-        <h2 className="page-title">{t('progress.title')}</h2>
-        <p className="muted">{t('progress.needLogin')}</p>
-      </div>
-    );
-  }
+  }, [locale]);
 
   if (loading) return <div className="page"><p className="muted">{t('progress.loading')}</p></div>;
   if (err) return <div className="page"><p className="error-box">{t('error.generic', { error: err })}</p></div>;

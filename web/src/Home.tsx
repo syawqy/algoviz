@@ -29,10 +29,9 @@ export function StatusBadge({ status }: { status: string | null }) {
 interface Props {
   onOpen: (slug: string) => void;
   onPattern: (slug: string) => void;
-  loggedIn: boolean;
 }
 
-export default function Home({ onOpen, onPattern, loggedIn }: Props) {
+export default function Home({ onOpen, onPattern }: Props) {
   const { t, locale } = useTranslation();
   const [daily, setDaily] = useState<(Problem & { hint: string }) | null>(null);
   const [day, setDay] = useState<string>('');
@@ -180,7 +179,6 @@ export default function Home({ onOpen, onPattern, loggedIn }: Props) {
             ))}
           </ul>
         )}
-        {!loggedIn ? <p className="muted small">{t('progress.needLogin')}</p> : null}
       </section>
     </div>
   );

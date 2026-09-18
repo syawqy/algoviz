@@ -6,16 +6,14 @@ import { useTranslation } from './i18n/useTranslation';
 
 interface Props {
   slug: string;
-  loggedIn: boolean;
   onBack: () => void;
 }
 
-export default function ProblemView({ slug, loggedIn, onBack }: Props) {
+export default function ProblemView({ slug, onBack }: Props) {
   const { t, locale } = useTranslation();
   const [problem, setProblem] = useState<ProblemDetail | null>(null);
   const [err, setErr] = useState('');
   const [showSolution, setShowSolution] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setProblem(null);
@@ -26,24 +24,6 @@ export default function ProblemView({ slug, loggedIn, onBack }: Props) {
       .then((d) => setProblem(d.problem))
       .catch((e) => setErr(String(e.message ?? e)));
   }, [slug, locale]);
-
-  async function mark(status: 'selesai' | 'ulang') {
-    if (!problem || !loggedIn) return;
-    setSaving(true);
-    try {
-      if (problem.status === status) {
-        await api.unmark(problem.slug);
-        setProblem({ ...problem, status: null });
-      } else {
-        await api.mark(problem.slug, status);
-        setProblem({ ...problem, status });
-      }
-    } catch (e: any) {
-      setErr(String(e.message ?? e));
-    } finally {
-      setSaving(false);
-    }
-  }
 
   if (err) {
     return (
@@ -88,24 +68,6 @@ export default function ProblemView({ slug, loggedIn, onBack }: Props) {
             <StatusBadge status={problem.status} />
           </div>
         </div>
-        {loggedIn ? (
-          <div className="row-tight">
-            <button
-              className={problem.status === 'selesai' ? 'btn-primary' : 'btn-ghost'}
-              onClick={() => mark('selesai')}
-              disabled={saving}
-            >
-              {problem.status === 'selesai' ? t('status.done') : t('status.markDone')}
-            </button>
-            <button
-              className={problem.status === 'ulang' ? 'btn-warn' : 'btn-ghost'}
-              onClick={() => mark('ulang')}
-              disabled={saving}
-            >
-              {problem.status === 'ulang' ? t('status.markReview') : t('status.review')}
-            </button>
-          </div>
-        ) : null}
       </div>
 
       <div className="split">

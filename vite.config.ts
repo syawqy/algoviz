@@ -23,6 +23,7 @@ function cssAsAsset(): Plugin {
 }
 
 export default defineConfig({
+  base: process.env.GITHUB_PAGES ? '/algoviz/' : '/',
   root: 'web',
   plugins: [cssAsAsset(), react()],
   build: {
