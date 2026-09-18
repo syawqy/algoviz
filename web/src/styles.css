@@ -514,8 +514,8 @@ button {
               background-color var(--duration-normal) var(--ease-smooth);
 }
 
-.pattern-emoji {
-  font-size: 1.5rem;
+.pattern-icon {
+  color: var(--brand);
   line-height: 1;
   margin-bottom: 4px;
 }

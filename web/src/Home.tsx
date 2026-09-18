@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { api, type Pattern, type Problem } from './api';
 import { useTranslation } from './i18n/useTranslation';
+import {
+  ArrowLeftRight,
+  SquareStack,
+  Map,
+  Search,
+  BarChart3,
+  Waves,
+  BookOpen,
+  Target,
+} from 'lucide-react';
 
 // Difficulty arrives from the API as a stable lowercase token (mudah/sedang/
 // sulit) so the styling keys off a value that never changes with the language.
@@ -26,37 +36,32 @@ export function StatusBadge({ status }: { status: string | null }) {
   );
 }
 
-// Pattern emojis for visual identity
-const PATTERN_EMOJI: Record<string, string> = {
-  'two-pointer': '\u{1F449}',
-  'sliding-window': '\u{1FA9F}',
-  'hash-map': '\u{1F5FA}',
-  'binary-search': '\u{1F50D}',
-  'dynamic-programming': '\u{1F4CA}',
-  'bfs-dfs': '\u{1F30A}',
-  'stack': '\u{1F4DA}',
-  'greedy-interval': '\u{1F3AF}',
+// Pattern icons (Lucide)
+const PATTERN_ICON: Record<string, React.ReactNode> = {
+  'two-pointer': <ArrowLeftRight size={20} />,
+  'sliding-window': <SquareStack size={20} />,
+  'hash-map': <Map size={20} />,
+  'binary-search': <Search size={20} />,
+  'dynamic-programming': <BarChart3 size={20} />,
+  'bfs-dfs': <Waves size={20} />,
+  'stack': <BookOpen size={20} />,
+  'greedy-interval': <Target size={20} />,
 };
 
-// Staggered entrance observer
+// Staggered entrance: adds .visible after mount
 function useStaggeredEntrance() {
   const ref = useRef<HTMLDivElement>(null);
+  const [attached, setAttached] = useState(false);
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add('visible');
-          obs.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return ref;
+    if (!ref.current) return;
+    const t = setTimeout(() => ref.current?.classList.add('visible'), 60);
+    return () => clearTimeout(t);
+  }, [attached]);
+  const callbackRef = (el: HTMLDivElement | null) => {
+    (ref as React.MutableRefObject<HTMLDivElement | null>).current = el;
+    if (el) setAttached(true);
+  };
+  return callbackRef;
 }
 
 interface Props {
@@ -161,7 +166,7 @@ export default function Home({ onOpen, onPattern }: Props) {
         <div className="pattern-grid stagger-children" ref={patternRef}>
           {patterns.map((p) => (
             <button key={p.slug} className="pattern-card" onClick={() => onPattern(p.slug)}>
-              <span className="pattern-emoji">{PATTERN_EMOJI[p.slug] ?? '\u{1F4A1}'}</span>
+              <span className="pattern-icon">{PATTERN_ICON[p.slug] ?? '💡'}</span>
               <span className="pattern-name">{p.name}</span>
               <span className="pattern-count">{t('pattern.problemCount', { count: p.problem_count })}</span>
               <span className="pattern-blurb">{p.blurb}</span>
