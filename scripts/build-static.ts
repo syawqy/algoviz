@@ -57,6 +57,10 @@ function problem(slug: string, locale: string) {
     WHERE p.slug = ?
   `).get(slug) as any;
   if (!row) return null;
+  // visual_data is stored as JSON text in SQLite — parse it like the server does
+  if (row.visual_data) {
+    try { row.visual_data = JSON.parse(row.visual_data); } catch { /* already object */ }
+  }
   if (locale === 'en') {
     const en = PROBLEM_EN[slug];
     if (en) {

@@ -89,6 +89,27 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   problems: (params: { pattern?: string; difficulty?: string; q?: string } = {}) => {
+    if (IS_STATIC) {
+      // In static mode, the server ignores query params — fetch all problems
+      // and filter client-side.
+      const qs = new URLSearchParams(
+        Object.entries({ locale: getLocale() })
+      ).toString();
+      return req<{ problems: Problem[] }>(withLocale('/api/problems'))
+        .then(({ problems }) => {
+          let result = problems;
+          if (params.pattern) result = result.filter((p) => p.pattern_slug === params.pattern);
+          if (params.difficulty) result = result.filter((p) => p.difficulty === params.difficulty);
+          if (params.q) {
+            const q = params.q.toLowerCase();
+            result = result.filter((p) =>
+              p.title.toLowerCase().includes(q) ||
+              p.pattern_name.toLowerCase().includes(q)
+            );
+          }
+          return { problems: result };
+        });
+    }
     const qs = new URLSearchParams(
       Object.entries(params).filter(([, v]) => v) as Array<[string, string]>
     ).toString();
