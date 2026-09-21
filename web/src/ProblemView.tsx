@@ -72,13 +72,8 @@ export default function ProblemView({ slug, onBack }: Props) {
       </div>
 
       <div className="split">
-        {/* Left: Visualizer (glassmorphism treatment) */}
-        <section className="panel panel-left viz-panel">
-          <Visualizer kind={problem.visual_kind} data={problem.visual_data} />
-        </section>
-
-        {/* Right: Explanation (sticky scroll on desktop) */}
-        <section className="panel panel-right">
+        {/* Left: Problem description (sticky scroll on desktop) */}
+        <section className="panel panel-left">
           <h3 className="panel-title">{t('problem.statementHeading')}</h3>
           <p className="statement">{problem.statement}</p>
 
@@ -124,6 +119,11 @@ export default function ProblemView({ slug, onBack }: Props) {
               </>
             ) : null}
           </div>
+        </section>
+
+        {/* Right: Visualizer */}
+        <section className="panel panel-right viz-panel">
+          <Visualizer kind={problem.visual_kind} data={problem.visual_data} />
         </section>
       </div>
     </div>

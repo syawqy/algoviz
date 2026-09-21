@@ -625,7 +625,7 @@ button {
   backdrop-filter: blur(12px) saturate(150%);
   -webkit-backdrop-filter: blur(12px) saturate(150%);
   border: 1px solid rgba(139, 92, 246, 0.15);
-  border-left: 3px solid var(--brand);
+  border-right: 3px solid var(--brand);
 }
 
 .panel-title {
