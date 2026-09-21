@@ -205,6 +205,98 @@ export const PROBLEM_EN: Record<string, ProblemTranslation> = {
     time_complexity: 'O(amount * len(coins))',
     space_complexity: 'O(amount)',
   },
+  'rate-limiter': {
+    title: 'API Rate Limiter',
+    statement:
+      'You are building an API rate limiter. The server logs the time of each incoming request within a window (e.g. 1 second). Determine whether a new request should be accepted or rejected based on the maximum number of requests per window.',
+    hint: 'Imagine a moving window that covers the last N seconds. If the request count inside the window is still below the limit, the request is accepted. If full, it is rejected.',
+    walkthrough:
+      'Example: limit = 3 requests per second.\n\nRequest at second 1: window empty. Accept.\nRequest at second 1: count is 1. Accept.\nRequest at second 1: count is 2. Accept.\nRequest at second 1: count is 3, LIMIT REACHED! Reject.\nRequest at second 2: second 1 exits window. Count 0. Accept.\n\nKey insight: any request older than N seconds is evicted from the window. As long as remaining count is below the limit, new requests are accepted.',
+    solution: `from collections import deque\n\ndef is_allowed(requests, limit, window):\n    queue = deque()\n    for t in requests:\n        while queue and queue[0] <= t - window:\n            queue.popleft()\n        if len(queue) < limit:\n            queue.append(t)\n        else:\n            print(f"Request at {t}: REJECTED")`,
+  },
+  'uptime-tracker': {
+    title: 'Server Uptime Tracker',
+    statement:
+      'You are monitoring server status over N minutes. The server can be UP (1) or DOWN (0). Find the longest duration the server stays active, allowing at most k minutes of downtime within that window.',
+    hint: 'This is a sliding window variant: expand the window right, count zeros (downtime) inside. If zeros exceed k, slide the left boundary until zeros are valid again.',
+    walkthrough:
+      'Example status: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1] and k=1.\n\nWindow [1,1,0] zeros=1 <= k. Length 3.\nExpand: [1,1,0,1] zeros=1. Length 4.\nExpand: [1,1,0,1,1] zeros=1. Length 5.\nExpand: [1,1,0,1,1,1] zeros=1. Length 6.\nExpand: [1,1,0,1,1,1,0] zeros=2 > k! Slide left.\n...etc.\n\nKey insight: window always stays valid with at most k zeros. Each element enters and exits the window exactly once.',
+    solution: `def max_uptime(status, k):\n    left = 0\n    zeros = 0\n    best = 0\n    for right in range(len(status)):\n        if status[right] == 0:\n            zeros += 1\n        while zeros > k:\n            if status[left] == 0:\n                zeros -= 1\n            left += 1\n        best = max(best, right - left + 1)\n    return best`,
+  },
+  'first-unique-char': {
+    title: 'First Unique Log Level',
+    statement:
+      'Given a string of characters (e.g. log level: "aabbc"), find the index of the first character that appears only once. If none exists, return -1.',
+    hint: 'First, count how many times each character appears using a hash map. Then scan the string from the beginning: the first character with a count of 1 is the answer.',
+    walkthrough:
+      'Example string: "aabbcdc".\n\nCount occurrences: a=2, b=2, c=2, d=1.\nScan from left: a (2 times, skip), a (skip), b (skip), b (skip), c (skip), d (1 time!).\nAnswer: index 5.\n\nKey insight: two passes. First pass fills the frequency table. Second pass finds the character with frequency exactly 1.',
+    solution: `def first_unique_char(s):\n    freq = {}\n    for ch in s:\n        freq[ch] = freq.get(ch, 0) + 1\n    for i, ch in enumerate(s):\n        if freq[ch] == 1:\n            return i\n    return -1`,
+  },
+  'encoding-validator': {
+    title: 'Encoding Validator',
+    statement:
+      'Given two strings, determine if they are isomorphic (can be mapped one-to-one from the first character set to the second). For example, "egg" and "add" are isomorphic because e->a, g->d.',
+    hint: 'For each character pair at the same position, ensure the mapping is consistent. If e is already mapped to a, then e cannot map to anything else.',
+    walkthrough:
+      'Example s = "egg", t = "add".\n\ne -> a: save mapping e->a.\ng -> d: save mapping g->d.\ng -> d: mapping g->d already exists, match!\n\nAll consistent, answer: isomorphic.\n\nKey insight: two hash maps are needed: one for s->t mapping, one for t->s mapping.',
+    solution: `def is_isomorphic(s, t):\n    if len(s) != len(t):\n        return False\n    s_to_t = {}\n    t_to_s = {}\n    for cs, ct in zip(s, t):\n        if cs in s_to_t and s_to_t[cs] != ct:\n            return False\n        if ct in t_to_s and t_to_s[ct] != cs:\n            return False\n        s_to_t[cs] = ct\n        t_to_s[ct] = cs\n    return True`,
+  },
+  'peak-element': {
+    title: 'Peak Traffic Detector',
+    statement:
+      'You have traffic-per-hour data as an array. The array is "mountain-shaped" — it rises then falls. Find the index of the peak (largest value) using binary search.',
+    hint: 'At the middle position, if the middle element is smaller than its right neighbor, the peak must be on the right. If larger than both neighbors, that IS the peak!',
+    walkthrough:
+      'Example traffic: [1, 3, 5, 7, 6, 4, 2].\n\nStep 1: left=0, right=6, mid=3 (value 7).\n7 > left neighbor (5) AND 7 > right neighbor (6)? Yes! 7 is the peak.\n\nFor array [1, 3, 5, 4, 3, 2, 1]\nStep 1: mid=3 (value 4). 4 < 5 (left), search left.\nStep 2: mid=1 (value 3). 3 < 5 (left), search left.\nStep 3: mid=0 (value 1). 1 < 3 (right), search right.\nStep 4: mid=1 (value 3). Peak found!\n\nKey insight: search direction is determined by comparing with neighbors, not a fixed target.',
+    solution: `def find_peak(traffic):\n    left, right = 0, len(traffic) - 1\n    while left < right:\n        mid = (left + right) // 2\n        if traffic[mid] < traffic[mid + 1]:\n            left = mid + 1\n        else:\n            right = mid\n    return left`,
+  },
+  'budget-optimizer': {
+    title: 'Budget Optimizer',
+    statement:
+      'You have projects with different profits. Choose projects to maximize profit, but you cannot pick two adjacent projects (conflict of interest). Find the maximum profit.',
+    hint: 'At each project, you have two choices: take it or skip it. If you take it, the previous project must be skipped. If you skip, take the best from before.',
+    walkthrough:
+      'Example profit: [5, 10, 8, 3, 7, 4].\n\nProject 1 (5): take=5, skip=0\nProject 2 (10): take=0+10=10, skip=max(5,0)=5\nProject 3 (8): take=5+8=13, skip=max(10,5)=10\nProject 4 (3): take=10+3=13, skip=max(13,10)=13\nProject 5 (7): take=13+7=20, skip=max(13,13)=13\nProject 6 (4): take=13+4=17, skip=max(20,13)=20\n\nAnswer: max(17, 20) = 20.\n\nKey insight: at each step, compute two values: profit if this project is taken and if it is skipped.',
+    solution: `def max_profit(projects):\n    take, skip = 0, 0\n    for p in projects:\n        take, skip = skip + p, max(skip, take)\n    return max(take, skip)`,
+  },
+  'min-coin-change': {
+    title: 'Minimum Coins for Payment',
+    statement:
+      'You have several coin denominations (e.g. 1, 5, 10, 25). Find the fewest coins needed to make a given amount. This is like a vending machine that must give optimal change.',
+    hint: 'Build a table from amount 0 up to the target. For each amount, try each denomination as the last coin used. Pick the combination with the fewest coins.',
+    walkthrough:
+      'Example coins [1, 5, 10, 25] and target = 30.\n\nBuild table:\n0: 0 coins\n1: coin 1 -> 1 coin\n5: coin 5 -> 1 coin\n10: coin 10 -> 1 coin\n15: coin 10 + coin 5 -> 2 coins\n20: coin 10 + coin 10 -> 2 coins\n25: coin 25 -> 1 coin\n30: coin 25 + coin 5 -> 2 coins\n\nAnswer: 2 coins (25 + 5).\n\nKey insight: for each amount, try all denominations. Pick the one that yields the fewest coins.',
+    solution: `def min_coins(denom, amount):\n    IMPOSSIBLE = float("inf")\n    table = [0] + [IMPOSSIBLE] * amount\n    for value in range(1, amount + 1):\n        for c in denom:\n            if c <= value and table[value - c] + 1 < table[value]:\n                table[value] = table[value - c] + 1\n    return -1 if table[amount] == IMPOSSIBLE else table[amount]`,
+    time_complexity: 'O(amount * len(denom))',
+    space_complexity: 'O(amount)',
+  },
+  'min-cost-tracker': {
+    title: 'Min Cost Tracker',
+    statement:
+      'You have daily operational cost logs. For each day, determine how many days until there is a higher cost. If none exists, fill in 0.',
+    hint: 'Use a stack to store indices of days still waiting for a higher cost.',
+    walkthrough:
+      'Example costs: [100, 80, 120, 150, 90].\n\nDay 0 (100): stack empty, push 0.\nDay 1 (80): 80 < 100, push 1.\nDay 2 (120): 120 > 80! Day 1 done: 2-1 = 1 day. Pop 1.\n       120 > 100! Day 0 done: 2-0 = 2 days. Pop 0.\nDay 3 (150): 150 > 120! Day 2 done: 3-2 = 1. Pop 2.\nDay 4 (90): 90 < 150, push 4.\n\nRemaining in stack have no higher cost = 0.\nAnswer: [2, 1, 1, 0, 0]\n\nKey insight: the stack stores indices of days that have not found a higher cost yet.',
+    solution: `def next_higher(costs):\n    result = [0] * len(costs)\n    stack = []\n    for i, c in enumerate(costs):\n        while stack and costs[stack[-1]] < c:\n            j = stack.pop()\n            result[j] = i - j\n        stack.append(i)\n    return result`,
+  },
+  'expression-calculator': {
+    title: 'Expression Calculator',
+    statement:
+      'You are building a calculator that accepts input in Reverse Polish Notation (postfix). Example: "3 4 + 2 *" = (3+4)*2 = 14. Compute the result.',
+    hint: 'Read tokens left to right. If it is a number, push onto the stack. If it is an operator, pop the top two numbers, compute the result, and push it back.',
+    walkthrough:
+      'Expression: 3 4 + 2 *\n\nRead 3: number. Push. Stack: [3]\nRead 4: number. Push. Stack: [3, 4]\nRead +: operator. Pop 4 and 3. 3 + 4 = 7. Push 7. Stack: [7]\nRead 2: number. Push. Stack: [7, 2]\nRead *: operator. Pop 2 and 7. 7 * 2 = 14. Push 14. Stack: [14]\n\nDone, stack contains [14]. Answer: 14.\n\nKey insight: the stack holds operands that have not been processed yet.',
+    solution: `def eval_postfix(tokens):\n    stack = []\n    for token in tokens:\n        if token in "+-*/":\n            b = stack.pop()\n            a = stack.pop()\n            if token == "+": stack.append(a + b)\n            elif token == "-": stack.append(a - b)\n            elif token == "*": stack.append(a * b)\n            elif token == "/": stack.append(int(a / b))\n        else:\n            stack.append(int(token))\n    return stack[0]`,
+  },
+  'task-scheduler': {
+    title: 'Task Batch Scheduler',
+    statement:
+      'You have a list of tasks with start and end times. Merge overlapping tasks into batches. Each batch can run several tasks simultaneously. Find the minimum number of batches needed.',
+    hint: 'Sort tasks by start time. If the next task starts before the previous one ends, they can be merged into one batch. If separated, start a new batch.',
+    walkthrough:
+      'Example tasks: [[1, 4], [2, 3], [5, 7], [6, 8], [9, 10]].\n\nSorted: [1,4], [2,3], [5,7], [6,8], [9,10]\n\nTake [1,4] as start of batch 1.\n[2,3]: start 2 <= end 4? Yes! Merge.\n[5,7]: start 5 <= end 4? No. New batch: [5,7].\n[6,8]: start 6 <= end 7? Yes! Merge.\n[9,10]: start 9 <= end 8? No. New batch: [9,10].\n\nAnswer: 3 batches.\n\nKey insight: sort by start first, then merge overlapping ones.',
+    solution: `def batch_minimum(tasks):\n    tasks.sort(key=lambda x: x[0])\n    result = []\n    for start, end in tasks:\n        if result and start <= result[-1][1]:\n            result[-1][1] = max(result[-1][1], end)\n        else:\n            result.append([start, end])\n    return result`,
+  },
 };
 
 export interface PatternTranslation {
