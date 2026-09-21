@@ -4,7 +4,7 @@ A mobile-first web app for learning algorithm patterns through step-by-step visu
 
 Each problem ships with an interactive trace: press play, step forward and back, and watch the data structure change while a plain-language note explains what the step did and why.
 
-Live demo: <https://algoviz.syawqy.my.id>
+Live demo: <https://syawqy.github.io/algoviz/>
 
 ## Features
 
