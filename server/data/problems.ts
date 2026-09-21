@@ -884,7 +884,17 @@ Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin,
     hint: 'Bayangkan sebuah jendela bergerak yang mencakup N detik terakhir. Kalau jumlah request di dalam jendela masih di bawah batas, request diterima. Kalau sudah penuh, ditolak.',
     walkthrough:
       'Misal batas = 3 request per detik.\\n\\nRequest pada detik 1: window kosong. Terima.\\nRequest pada detik 1: window masih 1. Terima.\\nRequest pada detik 1: window masih 2. Terima.\\nRequest pada detik 1: window sudah 3, BATAS TERCAPAI! Tolak.\\nRequest pada detik 2: detik 1 keluar dari window. Sisa 0. Terima.\\n\\nKuncinya: setiap request yang lebih tua dari N detik dikeluarkan dari jendela.',
-    solution: 'from collections import deque\\n\\ndef is_allowed(requests, limit, window):\\n    queue = deque()\\n    for t in requests:\\n        while queue and queue[0] <= t - window:\\n            queue.popleft()\\n        if len(queue) < limit:\\n            queue.append(t)\\n        else:\\n            print(f\\"Request at {t}: TOLAK\\")',
+    solution: `from collections import deque
+
+def is_allowed(requests, limit, window):
+    queue = deque()
+    for t in requests:
+        while queue and queue[0] <= t - window:
+            queue.popleft()
+        if len(queue) < limit:
+            queue.append(t)
+        else:
+            print(f"Request at {t}: TOLAK")`,
     solution_lang: 'python',
     visual_kind: 'sliding-window',
     visual_data: { array: [1, 1, 1, 1, 2, 2, 3, 3, 3, 4], target: 3, mode: 'fixed' },
@@ -902,7 +912,19 @@ Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin,
     hint: 'Ini variasi sliding window: perbesar jendela ke kanan, hitung jumlah zeros (down) di dalamnya. Kalau zeros melebihi k, geser batas kiri sampai zeros kembali valid.',
     walkthrough:
       'Misal status: [1, 1, 0, 1, 1, 1, 0, 1] dan k=1.\\n\\nJendela [1,1,0] zeros=1. Panjang 3.\\nPerlebar: [1,1,0,1] zeros=1. Panjang 4.\\nPerlebar: [1,1,0,1,1] zeros=1. Panjang 5.\\nPerlebar: [1,1,0,1,1,1] zeros=1. Panjang 6.\\n\\nKuncinya: jendela selalu valid dengan maksimum k zeros.',
-    solution: 'def max_uptime(status, k):\\n    kiri = 0\\n    zeros = 0\\n    terbaik = 0\\n    for kanan in range(len(status)):\\n        if status[kanan] == 0:\\n            zeros += 1\\n        while zeros > k:\\n            if status[kiri] == 0:\\n                zeros -= 1\\n            kiri += 1\\n        terbaik = max(terbaik, kanan - kiri + 1)\\n    return terbaik',
+    solution: `def max_uptime(status, k):
+    kiri = 0
+    zeros = 0
+    terbaik = 0
+    for kanan in range(len(status)):
+        if status[kanan] == 0:
+            zeros += 1
+        while zeros > k:
+            if status[kiri] == 0:
+                zeros -= 1
+            kiri += 1
+        terbaik = max(terbaik, kanan - kiri + 1)
+    return terbaik`,
     solution_lang: 'python',
     visual_kind: 'sliding-window',
     visual_data: { array: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1], target: 1, mode: 'no-repeat' },
@@ -920,7 +942,14 @@ Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin,
     hint: 'Pertama, hitung berapa kali setiap huruf muncul menggunakan hash map. Lalu telusuri string dari awal: huruf pertama dengan jumlah kemunculan 1 adalah jawabannya.',
     walkthrough:
       'Misal string: "aabbcdc".\\n\\nHitung kemunculan: a=2, b=2, c=2, d=1.\\nTelusuri dari kiri: a (2 kali, skip), b (skip), c (skip), d (1 kali!).\\nJawaban: indeks 5.\\n\\nKuncinya: dua lintasan. Lintasan pertama mengisi tabel frekuensi. Lintasan kedua mencari yang frekuensinya tepat 1.',
-    solution: 'def karakter_unik_pertama(s):\\n    frekuensi = {}\\n    for ch in s:\\n        frekuensi[ch] = frekuensi.get(ch, 0) + 1\\n    for i, ch in enumerate(s):\\n        if frekuensi[ch] == 1:\\n            return i\\n    return -1',
+    solution: `def karakter_unik_pertama(s):
+    frekuensi = {}
+    for ch in s:
+        frekuensi[ch] = frekuensi.get(ch, 0) + 1
+    for i, ch in enumerate(s):
+        if frekuensi[ch] == 1:
+            return i
+    return -1`,
     solution_lang: 'python',
     visual_kind: 'hash-map',
     visual_data: { array: ['a', 'a', 'b', 'b', 'c', 'd', 'c'], target: null, mode: 'duplicate' },
@@ -938,7 +967,19 @@ Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin,
     hint: 'Untuk setiap pasangan karakter di posisi yang sama, pastikan mapping-nya konsisten. Kalau e sudah dipetakan ke a, maka e tidak boleh dipetakan ke yang lain.',
     walkthrough:
       'Misal s = "egg", t = "add".\\n\\ne -> a: simpan mapping e->a.\\ng -> d: simpan mapping g->d.\\ng -> d: sudah ada mapping g->d, cocok!\\n\\nKuncinya: dua hash map dibutuhkan: satu untuk mapping s->t, satu lagi untuk t->s.',
-    solution: 'def is_isomorphic(s, t):\\n    if len(s) != len(t):\\n        return False\\n    s_ke_t = {}\\n    t_ke_s = {}\\n    for cs, ct in zip(s, t):\\n        if cs in s_ke_t and s_ke_t[cs] != ct:\\n            return False\\n        if ct in t_ke_s and t_ke_s[ct] != cs:\\n            return False\\n        s_ke_t[cs] = ct\\n        t_ke_s[ct] = cs\\n    return True',
+    solution: `def is_isomorphic(s, t):
+    if len(s) != len(t):
+        return False
+    s_ke_t = {}
+    t_ke_s = {}
+    for cs, ct in zip(s, t):
+        if cs in s_ke_t and s_ke_t[cs] != ct:
+            return False
+        if ct in t_ke_s and t_ke_s[ct] != cs:
+            return False
+        s_ke_t[cs] = ct
+        t_ke_s[ct] = cs
+    return True`,
     solution_lang: 'python',
     visual_kind: 'hash-map',
     visual_data: { array: ['e', 'g', 'g', 'a', 'b', 'b'], target: null, mode: 'anagram' },
@@ -956,7 +997,15 @@ Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin,
     hint: 'Di posisi tengah, kalau elemen tengah lebih kecil dari tetangga kanannya, pasti peak ada di sebelah kanan. Kalau lebih besar dari keduanya, itu peak-nya!',
     walkthrough:
       'Misal traffic: [1, 3, 5, 7, 6, 4, 2].\\n\\nLangkah 1: tengah=3 (nilai 7). 7 > tetangga kanan (6)? Ya! 7 adalah peak.\\n\\nKuncinya: arah pencarian ditentukan oleh perbandingan dengan tetangga.',
-    solution: 'def cari_peak(traffic):\\n    kiri, kanan = 0, len(traffic) - 1\\n    while kiri < kanan:\\n        tengah = (kiri + kanan) // 2\\n        if traffic[tengah] < traffic[tengah + 1]:\\n            kiri = tengah + 1\\n        else:\\n            kanan = tengah\\n    return kiri',
+    solution: `def cari_peak(traffic):
+    kiri, kanan = 0, len(traffic) - 1
+    while kiri < kanan:
+        tengah = (kiri + kanan) // 2
+        if traffic[tengah] < traffic[tengah + 1]:
+            kiri = tengah + 1
+        else:
+            kanan = tengah
+    return kiri`,
     solution_lang: 'python',
     visual_kind: 'binary-search',
     visual_data: { array: [1, 3, 5, 7, 6, 4, 2], target: 7, mode: 'rotated' },
@@ -974,7 +1023,11 @@ Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin,
     hint: 'Di setiap proyek, kamu punya dua pilihan: ambil proyek ini atau lewati. Kalau ambil, proyek sebelumnya pasti dilewati.',
     walkthrough:
       'Misal profit: [5, 10, 8, 3, 7, 4].\\n\\nProyek 1 (5): ambil=5, lewati=0\\nProyek 2 (10): ambil=0+10=10, lewati=max(5,0)=5\\nProyek 3 (8): ambil=5+8=13, lewati=max(10,5)=10\\n...dst.\\n\\nJawaban: 20.\\n\\nKuncinya: di tiap langkah, hitung dua nilai: profit jika diambil dan jika dilewati.',
-    solution: 'def profit_maksimal(proyek):\\n    ambil, lewati = 0, 0\\n    for p in proyek:\\n        ambil, lewati = lewati + p, max(lewati, ambil)\\n    return max(ambil, lewati)',
+    solution: `def profit_maksimal(proyek):
+    ambil, lewati = 0, 0
+    for p in proyek:
+        ambil, lewati = lewati + p, max(lewati, ambil)
+    return max(ambil, lewati)`,
     solution_lang: 'python',
     visual_kind: 'dp-1d',
     visual_data: { array: [5, 10, 8, 3, 7, 4], mode: 'robber' },
@@ -992,7 +1045,14 @@ Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin,
     hint: 'Bangun tabel dari jumlah 0 ke target. Untuk setiap jumlah, coba setiap denominasi koin.',
     walkthrough:
       'Misal koin [1, 5, 10, 25] dan target = 30.\\n\\n30 = koin 25 + koin 5 = 2 koin.\\n\\nKuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua denominasi.',
-    solution: 'def koin_minimum(denom, jumlah):\\n    TAK_MUNGKIN = float("inf")\\n    tabel = [0] + [TAK_MUNGKIN] * jumlah\\n    for nilai in range(1, jumlah + 1):\\n        for k in denom:\\n            if k <= nilai and tabel[nilai - k] + 1 < tabel[nilai]:\\n                tabel[nilai] = tabel[nilai - k] + 1\\n    return -1 if tabel[jumlah] == TAK_MUNGKIN else tabel[jumlah]',
+    solution: `def koin_minimum(denom, jumlah):
+    TAK_MUNGKIN = float("inf")
+    tabel = [0] + [TAK_MUNGKIN] * jumlah
+    for nilai in range(1, jumlah + 1):
+        for k in denom:
+            if k <= nilai and tabel[nilai - k] + 1 < tabel[nilai]:
+                tabel[nilai] = tabel[nilai - k] + 1
+    return -1 if tabel[jumlah] == TAK_MUNGKIN else tabel[jumlah]`,
     solution_lang: 'python',
     visual_kind: 'dp-1d',
     visual_data: { coins: [1, 5, 10, 25], target: 30, mode: 'coin' },
@@ -1010,7 +1070,15 @@ Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin,
     hint: 'Gunakan stack untuk menyimpan indeks hari yang masih menunggu biaya lebih tinggi.',
     walkthrough:
       'Misal biaya: [100, 80, 120, 150, 90].\\n\\nHari 0 (100): tumpukan kosong, dorong 0.\\nHari 1 (80): 80 < 100, dorong 1.\\nHari 2 (120): 120 > 80! Hari 1 selesai: 1 hari. Pop 1.\\n       120 > 100! Hari 0 selesai: 2 hari. Pop 0.\\n...dst.\\n\\nJawaban: [2, 1, 1, 0, 0]',
-    solution: 'def biaya_naik(biaya):\\n    hasil = [0] * len(biaya)\\n    tumpukan = []\\n    for i, b in enumerate(biaya):\\n        while tumpukan and biaya[tumpukan[-1]] < b:\\n            j = tumpukan.pop()\\n            hasil[j] = i - j\\n        tumpukan.append(i)\\n    return hasil',
+    solution: `def biaya_naik(biaya):
+    hasil = [0] * len(biaya)
+    tumpukan = []
+    for i, b in enumerate(biaya):
+        while tumpukan and biaya[tumpukan[-1]] < b:
+            j = tumpukan.pop()
+            hasil[j] = i - j
+        tumpukan.append(i)
+    return hasil`,
     solution_lang: 'python',
     visual_kind: 'stack',
     visual_data: { array: [100, 80, 120, 150, 90], mode: 'next-greater', target: null },
@@ -1028,7 +1096,19 @@ Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin,
     hint: 'Baca token dari kiri ke kanan. Kalau angka, dorong ke tumpukan. Kalau operator, keluarkan dua angka teratas, hitung, dorong hasilnya.',
     walkthrough:
       'Ekspresi: 3 4 + 2 *\\n\\nBaca 3: dorong. [3]\\nBaca 4: dorong. [3, 4]\\nBaca +: keluarkan 4 dan 3. 3+4=7. Dorong 7. [7]\\nBaca 2: dorong. [7, 2]\\nBaca *: keluarkan 2 dan 7. 7*2=14. Dorong 14. [14]\\n\\nJawaban: 14.',
-    solution: 'def eval_postfix(tokens):\\n    tumpukan = []\\n    for token in tokens:\\n        if token in "+-*/":\\n            b = tumpukan.pop()\\n            a = tumpukan.pop()\\n            if token == "+": tumpukan.append(a + b)\\n            elif token == "-": tumpukan.append(a - b)\\n            elif token == "*": tumpukan.append(a * b)\\n            elif token == "/": tumpukan.append(int(a / b))\\n        else:\\n            tumpukan.append(int(token))\\n    return tumpukan[0]',
+    solution: `def eval_postfix(tokens):
+    tumpukan = []
+    for token in tokens:
+        if token in "+-*/":
+            b = tumpukan.pop()
+            a = tumpukan.pop()
+            if token == "+": tumpukan.append(a + b)
+            elif token == "-": tumpukan.append(a - b)
+            elif token == "*": tumpukan.append(a * b)
+            elif token == "/": tumpukan.append(int(a / b))
+        else:
+            tumpukan.append(int(token))
+    return tumpukan[0]`,
     solution_lang: 'python',
     visual_kind: 'stack',
     visual_data: { array: ['3', '4', '+', '2', '*'], mode: 'bracket', target: null },
@@ -1046,7 +1126,15 @@ Kuncinya: hitung dari bawah ke atas. Untuk setiap jumlah, coba semua jenis koin,
     hint: 'Urutkan task berdasarkan waktu mulai. Kalau task berikutnya mulai sebelum task sebelumnya selesai, mereka bisa digabung.',
     walkthrough:
       'Misal task: [[1, 4], [2, 3], [5, 7], [6, 8], [9, 10]].\\n\\n[1,4] dan [2,3] overlap -> batch 1.\\n[5,7] dan [6,8] overlap -> batch 2.\\n[9,10] -> batch 3.\\n\\nJawaban: 3 batch.',
-    solution: 'def batch_minimum(task):\\n    task.sort(key=lambda x: x[0])\\n    hasil = []\\n    for mulai, selesai in task:\\n        if hasil and mulai <= hasil[-1][1]:\\n            hasil[-1][1] = max(hasil[-1][1], selesai)\\n        else:\\n            hasil.append([mulai, selesai])\\n    return hasil',
+    solution: `def batch_minimum(task):
+    task.sort(key=lambda x: x[0])
+    hasil = []
+    for mulai, selesai in task:
+        if hasil and mulai <= hasil[-1][1]:
+            hasil[-1][1] = max(hasil[-1][1], selesai)
+        else:
+            hasil.append([mulai, selesai])
+    return hasil`,
     solution_lang: 'python',
     visual_kind: 'intervals',
     visual_data: { intervals: [[1, 4], [2, 3], [5, 7], [6, 8], [9, 10]] },
